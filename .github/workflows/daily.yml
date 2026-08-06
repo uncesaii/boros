@@ -1,0 +1,48 @@
+name: daily-snapshot
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # daily at 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  GH_REPO: ${{ github.repository }}
+
+concurrency:
+  group: daily-snapshot
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+      - name: Install gh
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+      - name: Create date-stamped branch
+        run: |
+          DATE="$(date -u +%Y-%m-%d)"
+          BRANCH="daily/${DATE}"
+          git fetch origin main:main || git clone --depth 1 https://github.com/${GH_REPO}.git .
+          git branch -f "${BRANCH}" main 2>/dev/null || git branch "${BRANCH}" main
+          git checkout "${BRANCH}"
+          git push origin "${BRANCH}" --force
+      - name: Ensure PR to main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE="$(date -u +%Y-%m-%d)"
+          gh pr create --repo "${GH_REPO}" --base main --head "daily/${DATE}" --fill --title "Daily snapshot ($(date -u +%Y-%m-%d))" --body "Automated daily work snapshot." || echo "PR already exists or no changes"

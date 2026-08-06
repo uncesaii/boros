@@ -1,0 +1,2 @@
+#!/usr/bin/env -S deno run --allow-all
+# Boros placeholder. Replaced by postinstall.mjs with the real native binary.

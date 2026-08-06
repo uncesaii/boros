@@ -1,0 +1,100 @@
+name: npm-publish
+
+run-name: publish npm @boros-ai/boros v${{ github.ref_name }}
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version tag (without v)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  NPM_REGISTRY: "https://registry.npmjs.org"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bun
+        with:
+          install-flags: --frozen-lockfile
+      - name: Resolve version
+        id: version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            V="${{ inputs.version }}"
+          else
+            ref="${GITHUB_REF#refs/tags/}"
+            V="${ref#v}"
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+      - name: Authenticate with npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm config set //${NPM_REGISTRY#https://}:_authToken "$NPM_TOKEN"
+          npm whoami
+      - name: Build native binaries (no GH release upload)
+        env:
+          OPENCODE_VERSION: ${{ steps.version.outputs.version }}
+          OPENCODE_CHANNEL: latest
+        run: |
+          # NOTE: deliberately NOT setting OPENCODE_RELEASE so build.ts skips gh release upload
+          bun run --cwd packages/opencode script/build.ts --skip-embed-web-ui
+      - name: Publish platform binary packages
+        run: |
+          set -e
+          VERSION="${{ steps.version.outputs.version }}"
+          for pkgjson in dist/*/package.json; do
+            [ -f "$pkgjson" ] || continue
+            dir=$(dirname "$pkgjson")
+            name=$(node -p "require('./$pkgjson').name")
+            # only publish platform carrier packages (boros-<platform>-<arch...>)
+            case "$name" in boros-*) : ;; *) echo "skip $name"; continue ;; esac
+            # limit published files to the binary and set the release version
+            node --input-type=commonjs -e "
+              const fs=require('fs');
+              const p=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));
+              p.files=['bin']; p.version=process.argv[2];
+              fs.writeFileSync(process.argv[1],JSON.stringify(p,null,2));
+            " "$pkgjson" "$VERSION"
+            if npm view "$name@$VERSION" version >/dev/null 2>&1; then
+              echo "already published $name@$VERSION, skipping"
+            else
+              echo "publishing platform package: $name @ $VERSION from $dir"
+              npm publish "$dir" --access public --tag latest
+            fi
+          done
+      - name: Publish root @boros-ai/boros
+        run: |
+          set -e
+          VERSION="${{ steps.version.outputs.version }}"
+          node --input-type=commonjs -e "
+            const fs=require('fs');
+            const pkg=JSON.parse(fs.readFileSync('npm/package.json','utf8'));
+            pkg.version=process.argv[1];
+            const deps={};
+            for (const p of fs.readdirSync('dist')){
+              const pj='dist/'+p+'/package.json';
+              if(!fs.existsSync(pj)) continue;
+              const j=JSON.parse(fs.readFileSync(pj,'utf8'));
+              if(/^boros-/.test(j.name)) deps[j.name]=pkg.version;
+            }
+            pkg.optionalDependencies=deps;
+            fs.writeFileSync('npm/package.json',JSON.stringify(pkg,null,2));
+            console.log('optionalDependencies:',JSON.stringify(deps));
+          " "$VERSION"
+          echo "publishing @boros-ai/boros @ $VERSION"
+          npm publish npm --access public --tag latest

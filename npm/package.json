@@ -1,0 +1,25 @@
+{
+  "name": "@boros-ai/boros",
+  "version": "1.0.0",
+  "description": "Boros — an offensive AI agent swarm. Native binary + platform installers.",
+  "license": "MIT",
+  "type": "module",
+  "os": ["darwin", "linux", "win32"],
+  "cpu": ["arm64", "x64"],
+  "bin": {
+    "boros": "./bin/boros"
+  },
+  "main": null,
+  "repository": { "type": "git", "url": "git+https://github.com/uncesaii/boros.git" },
+  "homepage": "https://github.com/uncesaii/boros",
+  "bugs": { "url": "https://github.com/uncesaii/boros/issues" },
+  "keywords": ["ai", "agent", "security", "offensive", "pentest"],
+  "scripts": {
+    "postinstall": "node ./postinstall.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": ["bin", "postinstall.mjs", "LICENSE"],
+  "optionalDependencies": {}
+}

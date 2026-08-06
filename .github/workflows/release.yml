@@ -1,0 +1,57 @@
+name: release
+
+run-name: ${{ format('release v{0}', github.ref_name) }}
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version tag (without v)"
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  GH_REPO: ${{ github.repository }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bun
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Resolve version
+        id: version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "tag=v${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version=${GITHUB_OUTPUT_tag#v}" >> "$GITHUB_OUTPUT"
+        env:
+          GITHUB_REF: ${{ github.ref }}
+      - name: Build all platform binaries and publish release
+        run: |
+          OPENCODE_CHANNEL=latest \
+          OPENCODE_VERSION="${{ steps.version.outputs.version }}" \
+          OPENCODE_RELEASE=1 \
+          GH_REPO="${GH_REPO}" \
+          GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+          bun run --cwd packages/opencode script/build.ts --skip-embed-web-ui
+      - name: Verify release assets exist
+        run: |
+          ls -la dist/ 2>/dev/null || true
+          gh release view "${{ steps.version.outputs.tag }}" --repo "${GH_REPO}" --json name,assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
