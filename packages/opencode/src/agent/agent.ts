@@ -31,6 +31,17 @@ import { LocationServiceMap, locationServiceMapLayer } from "@opencode-ai/core/l
 import { Reference } from "@opencode-ai/core/reference"
 import { Location } from "@opencode-ai/core/location"
 import { PluginV2 } from "@opencode-ai/core/plugin"
+import {
+  BOROS_DOCTRINE,
+  BOROS_ROOT,
+  BOROS_RECON,
+  BOROS_EXPLOIT,
+  BOROS_EXPLOIT_ENGINEER,
+  BOROS_PRIVESC,
+  BOROS_WEB,
+  BOROS_TRIAGE,
+  BOROS_ASSISTANT,
+} from "@opencode-ai/core/plugin/agent/prompt/boros-doctrine"
 
 export const Info = Schema.Struct({
   name: Schema.String,
@@ -140,8 +151,10 @@ const layer = Layer.effect(
         const agents: Record<string, Info> = {
           build: {
             name: "build",
-            description: "The default agent. Executes tools based on configured permissions.",
+            description:
+              "Boros root orchestrator — runs the offensive kill chain to a verified compromise by delegating to specialist operators.",
             options: {},
+            prompt: BOROS_ROOT + "\n\n" + BOROS_DOCTRINE,
             permission: Permission.merge(
               defaults,
               Permission.fromConfig({
@@ -261,6 +274,165 @@ const layer = Layer.effect(
               user,
             ),
             prompt: PROMPT_SUMMARY,
+          },
+          recon: {
+            name: "recon",
+            description:
+              "Reconnaissance operator — maps the attack surface and produces ranked exploitable leads with versions + vulnerability hypotheses.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "secondary",
+            prompt: BOROS_RECON + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          exploit: {
+            name: "exploit",
+            description:
+              "Exploitation operator — turns weaknesses into real access (shells, flags, accounts) with evidence.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "error",
+            prompt: BOROS_EXPLOIT + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          "exploit-engineer": {
+            name: "exploit-engineer",
+            description:
+              "Exploit Engineer operator — reverse-engineering + exploit development: patch-diffing, fuzzing, sanitizer-confirmed PoCs, deterministic exploit code (memory corruption, logic flaws, injection) to real code execution.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "error",
+            prompt: BOROS_EXPLOIT_ENGINEER + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          privesc: {
+            name: "privesc",
+            description:
+              "Privilege escalation operator — drives a foothold to root/SYSTEM/Domain Admin and proves it.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "warning",
+            prompt: BOROS_PRIVESC + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          web: {
+            name: "web",
+            description:
+              "Web exploitation operator — breaks web apps/APIs (RCE/SQLi/SSRF/XSS/auth-bypass) with request/response evidence.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "info",
+            prompt: BOROS_WEB + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          triage: {
+            name: "triage",
+            description:
+              "Triage operator — classifies the objective by attacker intent and routes to the right specialist.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "accent",
+            prompt: BOROS_TRIAGE + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                "*": "deny",
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                read: {
+                  "*": "allow",
+                  "*.env": "ask",
+                  "*.env.*": "ask",
+                },
+              }),
+              user,
+            ),
+          },
+          assistant: {
+            name: "assistant",
+            description:
+              "Assistant operator — tooling/payload dev, credential/foothold management, coordination, reporting.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "success",
+            prompt: BOROS_ASSISTANT + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
           },
         }
 

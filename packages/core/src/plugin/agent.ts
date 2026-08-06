@@ -16,6 +16,7 @@ import {
   BOROS_WEB,
   BOROS_TRIAGE,
   BOROS_ASSISTANT,
+  BOROS_EXPLOIT_ENGINEER,
 } from "./agent/prompt/boros-doctrine"
 
 const TRUNCATION_GLOB = path.join(Global.Path.data, "tool-output", "*")
@@ -238,6 +239,26 @@ export const Plugin = define({
         item.permissions.push(
           ...PermissionV2.merge(defaults, [
             { action: "bash", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
+      })
+
+      draft.update(AgentV2.ID.make("exploit-engineer"), (item) => {
+        item.description =
+          "Exploit Engineer operator — reverse-engineering + exploit development: patch-diffing, fuzzing, sanitizer-confirmed PoCs, deterministic exploit code (memory corruption, logic flaws, injection) to real code execution."
+        item.system = BOROS_EXPLOIT_ENGINEER + "\n\n" + BOROS_DOCTRINE
+        item.mode = "subagent"
+        item.color = "error"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "edit", resource: "*", effect: "allow" },
+            { action: "write", resource: "*", effect: "allow" },
             { action: "webfetch", resource: "*", effect: "allow" },
             { action: "websearch", resource: "*", effect: "allow" },
             { action: "skill", resource: "*", effect: "allow" },

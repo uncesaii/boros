@@ -122,6 +122,7 @@ describe("AgentV2", () => {
           "compaction",
           "explore",
           "exploit",
+          "exploit-engineer",
           "general",
           "plan",
           "privesc",
@@ -138,7 +139,7 @@ describe("AgentV2", () => {
       for (const id of ["build", "compaction", "explore", "general", "plan", "summary", "title", "triage"]) {
         expect(hasExplicitBash(id)).toBe(false)
       }
-      for (const id of ["recon", "exploit", "privesc", "web", "assistant"]) {
+      for (const id of ["recon", "exploit", "exploit-engineer", "privesc", "web", "assistant"]) {
         expect(hasExplicitBash(id)).toBe(true)
       }
     }),
