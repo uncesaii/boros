@@ -208,3 +208,9 @@ When the Boros agent reviews a PR, it checks:
 2. All real provider `/model` and `/connect` behavior is preserved.
 3. No OpenCode-only cloud endpoints are introduced into the terminal path.
 4. Native agent/skill registration is consistent with `AGENTS.md` conventions.
+
+## References
+
+- Base / shell: OpenCode — https://github.com/anomalyco/opencode
+- Flow: Strix — https://github.com/usestrix/strix
+- Exodus — https://github.com/exodialabsxyz/exodus
