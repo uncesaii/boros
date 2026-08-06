@@ -1,0 +1,36 @@
+name: PR Agent
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+  issue_comment:
+
+jobs:
+  pr_agent_job:
+    if: ${{ github.event.sender.type != 'Bot' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+      checks: write
+    name: Run pr agent on every pull request, respond to user comments
+    steps:
+      - name: PR Agent action step
+        id: pragent
+        uses: the-pr-agent/pr-agent@main
+        env:
+          OPENAI_KEY: ${{ secrets.BOROS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BOROS_TOKEN }}
+          # GitHub Models (OpenAI-compatible) endpoint
+          OPENAI__API_BASE: "https://models.github.ai/inference/v1"
+          OPENAI__KEY: ${{ secrets.BOROS_TOKEN }}
+          # Model selection for code review
+          config.model: "openai/gpt-4.1"
+          config.fallback_models: '["openai/gpt-4o-mini"]'
+          config.ai_timeout: "300"
+          # Enable automatic tools
+          github_action_config.auto_review: "true"
+          github_action_config.auto_describe: "true"
+          github_action_config.auto_improve: "false"
+          github_action_config.pr_actions: '["opened", "reopened", "ready_for_review", "synchronize"]'
