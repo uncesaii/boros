@@ -1,0 +1,48 @@
+name: snapshot-branch
+
+# Mirrors every push to `main` onto a fresh date-stamped `snapshot/YYYY-MM-DDTHHMMSS`
+# branch so every commit on main is individually reviewable and traceable.
+# See AGENTS.md "Production workflow > Branching".
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit SHA to snapshot (defaults to the workflow SHA)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: snapshot-${{ github.ref }}-${{ github.run_number }}
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha || github.ref }}
+          fetch-depth: 0
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config push.default simple
+      - name: Create date-stamped snapshot branch
+        env:
+          SHA: ${{ inputs.sha || github.sha }}
+        run: |
+          TS="$(date -u +%Y-%m-%dT%H%M%SZ)"
+          BRANCH="snapshot/${TS}"
+          git branch -f "$BRANCH" "$SHA"
+          git push origin "$BRANCH"
+          echo "snapshot=$BRANCH" >> "$GITHUB_OUTPUT"
+      - name: Ensure PR-like reference exists
+        run: |
+          echo "Snapshot branch created: ${{ steps.create.outputs.snapshot }}"

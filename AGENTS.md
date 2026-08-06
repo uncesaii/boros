@@ -159,3 +159,52 @@ const table = sqliteTable("session", {
 - Keep delivery vocabulary explicit. Prompts steer by default and promote at the next safe provider-turn boundary while the current drain requires continuation. An explicit `queue` input remains pending until the Session would otherwise become idle; promote one queued input at that boundary, then reevaluate continuation before promoting another. Promoting any new user input resets the selected agent's provider-turn allowance; a batch of steers resets it once.
 - Keep EventV2 replay owner claims separate from clustered Session execution ownership.
 - Keep the System Context algebra, registry, and built-ins in `src/system-context`; keep Context Source producers with their observed domains, and keep Session History selection plus Context Epoch persistence Session-owned.
+
+## Production workflow
+
+This is a production codebase. The following conventions are enforced on `main`
+and are the responsibility of every contributor (and of the Boros agent when it
+lands changes).
+
+### Branching — every commit is a date-stamped branch
+
+No work lands on `main` directly. Each unit of work lives on its own
+date-stamped branch so it is individually reviewable and traceable:
+
+- Branch name: `snapshot/YYYY-MM-DDTHHMMSS` (optionally `-<short-topic>`),
+  e.g. `snapshot/2026-08-06T143210-agent-permissions`.
+- Create it from a clean `git switch -c snapshot/$(date +%Y-%m-%dT%H%M%S)-my-topic`.
+- Commit on that branch. The CI workflow `snapshot-branch.yml` automatically
+  mirrors every push to `main` onto a fresh `snapshot/YYYY-MM-DDTHHMMSS` branch
+  as an audit point; contributors may also use `scripts/new-day.sh` to create the
+  branch and open its PR in one step.
+
+### Pull requests — review is mandatory
+
+- All changes go through a pull request into `main`.
+- `main` is protected: **at least one approving review** is required, CI
+  (`ci.yml`: typecheck + unit tests + build smoke) must be green, and the
+  agent (Boros) reviews each PR for correctness, security, and style before
+  approving. Do **not** merge your own PRs without a review.
+- Use **squash-and-merge** so `main` history stays linear and each commit is
+  one coherent unit. Include a concise summary of the change in the PR title.
+
+### Releases — tag-driven CD
+
+- A release is cut by pushing an annotated tag `v<semver>` (e.g. `v1.0.0`) on
+  `main`. This triggers `release.yml`, which builds the native binaries for all
+  12 platforms and publishes them to the GitHub release, and `npm-publish.yml`,
+  which publishes `@boros-ai/boros` (+ per-platform carrier packages) to npm.
+- Do not edit `npm/` package files or hand-publish to npm; the workflow does it
+  from the tag.
+- Patch/minor releases use the `latest` channel; pre-releases use a
+  `YYYY.MM.DD-pre.<n>` tag which is published to the matching npm tag.
+
+### Agent review scope
+
+When the Boros agent reviews a PR, it checks:
+1. No OpenCode paywall/rate-limit upsell paths are reintroduced (see
+   `packages/opencode/src/session/retry.ts`).
+2. All real provider `/model` and `/connect` behavior is preserved.
+3. No OpenCode-only cloud endpoints are introduced into the terminal path.
+4. Native agent/skill registration is consistent with `AGENTS.md` conventions.
