@@ -1,7 +1,7 @@
 /// <reference path="../../../markdown.d.ts" />
 
-import { AbsolutePath } from "../../schema"
-import { SkillV2 } from "../../skill"
+import { AbsolutePath } from "../../../schema"
+import { SkillV2 } from "../../../skill"
 
 import skill_0 from "./cloud_aws.txt" with { type: "text" }
 import skill_1 from "./cloud_gcp.txt" with { type: "text" }
