@@ -149,6 +149,16 @@ export const Plugin = define({
         item.system = BOROS_RECON + "\n\n" + BOROS_DOCTRINE
         item.mode = "subagent"
         item.color = "secondary"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
       })
 
       draft.update(AgentV2.ID.make("exploit"), (item) => {
@@ -156,6 +166,16 @@ export const Plugin = define({
         item.system = BOROS_EXPLOIT + "\n\n" + BOROS_DOCTRINE
         item.mode = "subagent"
         item.color = "error"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
       })
 
       draft.update(AgentV2.ID.make("privesc"), (item) => {
@@ -163,6 +183,16 @@ export const Plugin = define({
         item.system = BOROS_PRIVESC + "\n\n" + BOROS_DOCTRINE
         item.mode = "subagent"
         item.color = "warning"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
       })
 
       draft.update(AgentV2.ID.make("web"), (item) => {
@@ -170,6 +200,16 @@ export const Plugin = define({
         item.system = BOROS_WEB + "\n\n" + BOROS_DOCTRINE
         item.mode = "subagent"
         item.color = "info"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
       })
 
       draft.update(AgentV2.ID.make("triage"), (item) => {
@@ -177,6 +217,17 @@ export const Plugin = define({
         item.system = BOROS_TRIAGE + "\n\n" + BOROS_DOCTRINE
         item.mode = "subagent"
         item.color = "accent"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "*", resource: "*", effect: "deny" },
+            { action: "read", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
       })
 
       draft.update(AgentV2.ID.make("assistant"), (item) => {
@@ -184,6 +235,16 @@ export const Plugin = define({
         item.system = BOROS_ASSISTANT + "\n\n" + BOROS_DOCTRINE
         item.mode = "subagent"
         item.color = "success"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
       })
 
       draft.update(AgentV2.ID.make("plan"), (item) => {
