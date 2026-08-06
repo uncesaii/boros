@@ -61,7 +61,12 @@ import skill_54 from "./vulnerabilities_ssti.txt" with { type: "text" }
 import skill_55 from "./vulnerabilities_subdomain_takeover.txt" with { type: "text" }
 import skill_56 from "./vulnerabilities_weak_password_detection.txt" with { type: "text" }
 import skill_57 from "./vulnerabilities_xss.txt" with { type: "text" }
+import skill_54 from "./vulnerabilities_ssti.txt" with { type: "text" }
+import skill_55 from "./vulnerabilities_subdomain_takeover.txt" with { type: "text" }
+import skill_56 from "./vulnerabilities_weak_password_detection.txt" with { type: "text" }
+import skill_57 from "./vulnerabilities_xss.txt" with { type: "text" }
 import skill_58 from "./vulnerabilities_xxe.txt" with { type: "text" }
+import skill_59 from "./exploit_engineering.txt" with { type: "text" }
 
 export const BOROS_SKILLS = [
   SkillV2.Info.make({ name: "aws", description: "AWS cloud security testing covering IAM misconfigurations, S3 exposure, metadata abuse, and privilege escalation paths", location: AbsolutePath.make("/builtin/skills/cloud_aws"), content: skill_0 }),
@@ -123,4 +128,5 @@ export const BOROS_SKILLS = [
   SkillV2.Info.make({ name: "weak-password-detection", description: "Weak password detection, credential stuffing, and brute-force testing using common passwords, system-generated credentials, and HTTP fuzzing / NSE brute-force tooling", location: AbsolutePath.make("/builtin/skills/vulnerabilities_weak_password_detection"), content: skill_56 }),
   SkillV2.Info.make({ name: "xss", description: "XSS testing covering reflected, stored, and DOM-based vectors with CSP bypass techniques", location: AbsolutePath.make("/builtin/skills/vulnerabilities_xss"), content: skill_57 }),
   SkillV2.Info.make({ name: "xxe", description: "XXE testing for external entity injection, file disclosure, and SSRF via XML parsers", location: AbsolutePath.make("/builtin/skills/vulnerabilities_xxe"), content: skill_58 }),
+  SkillV2.Info.make({ name: "exploit-engineering", description: "Exploit development playbook — pin target + mitigations, patch-diffing (source or binary), fuzzing with sanitizers, root-cause to IPC primitive, ROP/heap exploitation for ASLR/NX/RELRO/CFG, and a deterministic PoC→exploit validation standard", location: AbsolutePath.make("/builtin/skills/exploit_engineering"), content: skill_59 }),
 ]
