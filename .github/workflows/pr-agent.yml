@@ -20,17 +20,16 @@ jobs:
         id: pragent
         uses: the-pr-agent/pr-agent@main
         env:
-          OPENAI_KEY: ${{ secrets.BOROS_TOKEN }}
+          OPENAI_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.BOROS_TOKEN }}
-          # GitHub Models (OpenAI-compatible) endpoint
-          OPENAI__API_BASE: "https://models.github.ai/inference/v1"
-          OPENAI__KEY: ${{ secrets.BOROS_TOKEN }}
+          # Google Gemini via litellm's native gemini handler
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           # Model selection for code review
-          config.model: "openai/gpt-4.1"
-          config.fallback_models: '["openai/gpt-4o-mini"]'
+          config.model: "gemini/gemini-3.5-flash"
+          config.fallback_models: '["gemini/gemini-3.5-flash-lite"]'
           config.ai_timeout: "300"
-          # gpt-4.1 is not in PR-Agent's built-in MAX_TOKENS map; supply the limit explicitly
-          config.custom_model_max_tokens: "128000"
+          # Truncation budget for the review prompts
+          config.custom_model_max_tokens: "32768"
           # The review bot identity
           bot.name: "boros-review"
           bot.trigger_phrase: "review"
