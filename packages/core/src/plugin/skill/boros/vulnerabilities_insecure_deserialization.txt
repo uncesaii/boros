@@ -160,7 +160,7 @@ When `TypeNameHandling` != `None`.
 
 ## Tooling
 
-Payload generation is the practitioner's core tool here. The sandbox has `git`/`python`/`go` and **interactsh-client** (OAST); add a JRE or `php-cli` if you need the Java/PHP generators.
+Payload generation is the practitioner's core tool here. The operator box has `git`/`python`/`go` and **interactsh-client** (OAST); add a JRE or `php-cli` if you need the Java/PHP generators.
 
 | Tool | Language / format | Use |
 |------|-------------------|-----|

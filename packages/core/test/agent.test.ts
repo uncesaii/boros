@@ -114,17 +114,37 @@ describe("AgentV2", () => {
       )
 
       const agents = yield* agent.all()
-      expect(agents.map((item) => String(item.id)).sort()).toEqual([
-        "build",
-        "compaction",
-        "explore",
-        "general",
-        "plan",
-        "summary",
-        "title",
-      ])
-      for (const item of agents) {
-        expect(item.permissions.some((rule) => rule.action === "bash" && rule.effect !== "deny")).toBe(false)
+      const byId = new Map(agents.map((item) => [String(item.id), item]))
+      expect([...byId.keys()].sort()).toEqual(
+        [
+          "assistant",
+          "build",
+          "compaction",
+          "crypto",
+          "explore",
+          "exploit",
+          "exploit-engineer",
+          "general",
+          "harness",
+          "llm",
+          "plan",
+          "post",
+          "privesc",
+          "recon",
+          "summary",
+          "title",
+          "triage",
+          "web",
+        ].sort(),
+      )
+      const hasExplicitBash = (id: string) =>
+        byId.get(id)?.permissions.some((rule) => rule.action === "bash" && rule.effect === "allow") ?? false
+
+      for (const id of ["build", "compaction", "explore", "general", "plan", "summary", "title", "triage"]) {
+        expect(hasExplicitBash(id)).toBe(false)
+      }
+      for (const id of ["recon", "exploit", "exploit-engineer", "privesc", "web", "assistant", "crypto", "llm", "post", "harness"]) {
+        expect(hasExplicitBash(id)).toBe(true)
       }
     }),
   )

@@ -1,7 +1,7 @@
 /// <reference path="../../../markdown.d.ts" />
 
-import { AbsolutePath } from "../../schema"
-import { SkillV2 } from "../../skill"
+import { AbsolutePath } from "../../../schema"
+import { SkillV2 } from "../../../skill"
 
 import skill_0 from "./cloud_aws.txt" with { type: "text" }
 import skill_1 from "./cloud_gcp.txt" with { type: "text" }
@@ -62,6 +62,11 @@ import skill_55 from "./vulnerabilities_subdomain_takeover.txt" with { type: "te
 import skill_56 from "./vulnerabilities_weak_password_detection.txt" with { type: "text" }
 import skill_57 from "./vulnerabilities_xss.txt" with { type: "text" }
 import skill_58 from "./vulnerabilities_xxe.txt" with { type: "text" }
+import skill_59 from "./exploit_engineering.txt" with { type: "text" }
+import skill_60 from "./cryptography.txt" with { type: "text" }
+import skill_61 from "./ai_llm_redteam.txt" with { type: "text" }
+import skill_62 from "./post_exploitation.txt" with { type: "text" }
+import skill_63 from "./harness_engineering.txt" with { type: "text" }
 
 export const BOROS_SKILLS = [
   SkillV2.Info.make({ name: "aws", description: "AWS cloud security testing covering IAM misconfigurations, S3 exposure, metadata abuse, and privilege escalation paths", location: AbsolutePath.make("/builtin/skills/cloud_aws"), content: skill_0 }),
@@ -123,4 +128,9 @@ export const BOROS_SKILLS = [
   SkillV2.Info.make({ name: "weak-password-detection", description: "Weak password detection, credential stuffing, and brute-force testing using common passwords, system-generated credentials, and HTTP fuzzing / NSE brute-force tooling", location: AbsolutePath.make("/builtin/skills/vulnerabilities_weak_password_detection"), content: skill_56 }),
   SkillV2.Info.make({ name: "xss", description: "XSS testing covering reflected, stored, and DOM-based vectors with CSP bypass techniques", location: AbsolutePath.make("/builtin/skills/vulnerabilities_xss"), content: skill_57 }),
   SkillV2.Info.make({ name: "xxe", description: "XXE testing for external entity injection, file disclosure, and SSRF via XML parsers", location: AbsolutePath.make("/builtin/skills/vulnerabilities_xxe"), content: skill_58 }),
+  SkillV2.Info.make({ name: "exploit-engineering", description: "Exploit development playbook — pin target + mitigations, patch-diffing (source or binary), fuzzing with sanitizers, root-cause to IPC primitive, ROP/heap exploitation for ASLR/NX/RELRO/CFG, and a deterministic PoC→exploit validation standard", location: AbsolutePath.make("/builtin/skills/exploit_engineering"), content: skill_59 }),
+  SkillV2.Info.make({ name: "cryptography", description: "Cryptography attack playbook — padding oracles (CBC/ECB, Bleichenbacher), CBC bit-flipping, ECB cut-and-paste, IV/nonce reuse, length-extension, hash cracking (hashcat/John), RSA/Wiener/Coppersmith/Håstad, ECDSA/DH nonce bias, TLS side-channels (Lucky13, Raccoon MSB oracle)", location: AbsolutePath.make("/builtin/skills/cryptography"), content: skill_60 }),
+  SkillV2.Info.make({ name: "ai-llm-redteam", description: "AI/LLM red teaming — direct/indirect prompt injection, jailbreaks (persona, multi-turn, encoding, best-of-N), RAG poisoning, system-prompt/model extraction, tool/MCP abuse, agent confused-deputy, with PyRIT/Garak automation and ASR-based scoring", location: AbsolutePath.make("/builtin/skills/ai_llm_redteam"), content: skill_61 }),
+  SkillV2.Info.make({ name: "post-exploitation", description: "Post-exploitation playbook — credential access (LSASS, DPAPI/browsers, Kerberos tickets, hashes), persistence, lateral movement (PTH/PTT/OPTH, WMI/SMB/WinRM/DCOM), pivoting/tunneling, C2 flow, evasion, and cleanup", location: AbsolutePath.make("/builtin/skills/post_exploitation"), content: skill_62 }),
+  SkillV2.Info.make({ name: "harness-engineering", description: "Engineer reusable attack machinery — intercepting proxies, target drivers, fuzz harnesses, oracle/brute loops, exploit scaffolds, callback/C2 beacons, payload factories with a unified run.py/core/payloads/out contract", location: AbsolutePath.make("/builtin/skills/harness_engineering"), content: skill_63 }),
 ]

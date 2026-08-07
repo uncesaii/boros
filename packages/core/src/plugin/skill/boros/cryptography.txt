@@ -1,0 +1,73 @@
+# Cryptography Attacks — from cryptographic bugs to compromise
+
+Use this skill when a target's cryptography is the weak point, or when a cryptographic primitive in an app/protocol/token needs to be attacked. Crypto bugs are logic bugs: a working attack is deterministic and provable, not a coin-flip. This is fields-and-protocols tradecraft for the practitioner (encryption, signatures, MACs, key exchange, password/credential safety) applied to the operator's targets.
+
+## 0. Recon the crypto surface
+
+Identify what crypto is actually protecting and how it's instantiated before choosing an attack:
+
+- Which algorithms, modes, and key sizes are used (TLS negotiated suite, JWT signing, salts/iterations for hashes, block-cipher mode in file formats, nonce handling)?
+- Where is the oracle (a server that reveals padding validity, a token that reveals succeed/fail, a trusted oracle for oracle-applications)?
+- What does *chosen-ciphertext* allow? Many crypto attacks need only a padding oracle (error behavior) or a timing difference, not key material.
+- What is the attacker's position: passive observer (traffic), active MITM (dedicated protocol), remote (web app endpoint), or offline (captured data/token/hash)?
+- Record parameters: cipher mode, block size, IV placement, MAC-and-encrypt vs encrypt-and-MAC, hash + salt layout, key sizes, randomness source (weak RNGs, `rand()` reuse).
+
+Decision on what to do first: if the primitive enforces confidentiality/authentication with a decoding oracle (padding/validity), the oracle attacks are reachable. If the data is offline (a file, a captured token), hash/length/known-plaintext attacks bite. If it's a key exchange/signature, target the math (small moduli, reused nonce) or the side channel.
+
+## 2. Block-cipher attacks (AES-CBC & friends)
+
+### CBC (and mode) — the padding / bitflip cluster
+
+- **Padding oracle (Vaudenay-style, works on CBC/ECB-with-padding when the endpoint reports padding errors distinctly)**: choose ciphertext, mutate the final block's padding, observe valid/invalid; iterate to decrypt block-by-block (PKCS#7). Each byte needs ~256 oracle calls. Automate: `padbuster`/`dotnet padbuster`; hand-rolled when padding handling is custom or the oracle is blind.
+- **CBC bit-flipping**: with known plaintext and the IV/prev-block in control, flip bits in block *i-1* to turn block *i*'s decrypted bytes into desired plaintext (headers, cookie `admin=0` → `admin=1`, auth-level bytes). Only affects the padding byte mismatch if you flip the *last* byte (decrypt to anything with only a padding fault) — use the bit-flip to make byte == its position (or your chosen byte) so padding validates.
+- **ECB cut-and-paste**: swap ciphertext blocks to reorder plaintext (tokens with a field separator — cut the `role=user` block and paste `role=admin`).
+- **IV reuse/nonce reuse**: XOR two ciphertexts with the same key+IV/for same nonce → the XOR of plaintexts leaks content; stream cipher nonce reuse gives keystream reuse.
+- **Meet-in-the-middle on double encryption / known plaintext**: the classic attack middle-layer; narrow search space.
+
+### Block cipher as an oracle: decryption oracle patterns
+
+(oracle = aspect of the output: which bytes decrypt to, padding valid at runtime, error message, response time.)
+Use a chosen-ciphertext to learn the plaintext byte-by-byte as above, or to craft a new plaintext for authentication/core bypasses.
+
+## 3. Hash attacks
+
+- **Length-extension (for SHA-1/SHA-256/SHA-512/MD5):** when a secret-prefix HMAC/integrity hash is `H(secret || message)` and known, append attacker data *without* the secret — the hash state is recoverable from the first hash and the new input runs on the extended state. Requires `hashpump`/`hash_extension`. Any Merkle-Damgård hash with a padded length check allows it.
+- **Password/credential cracking**: offline with hashcat/John modes per hash family (NTLM=1000, Kerberos 17/18/23, PMKID 22000, bcrypt=3200, `-a 0/1/3` combos). Wordlists + rules (`--rules=OneRuleToRuleThemAll`), iteration with mutated bases; runtime to report (not "maybe cracked").
+- **Birthday/second-preimage**: for collisions in Git commit objects / UUIDs / nonces sampled from a birthday field — probabilistic, note cost vs likelihood.
+- **WEAK hash in crypto contexts**: MD5/SHA-1 for signatures/commitments → chosen-prefix collision (two crafted files/tokens with the same digest — Git Poison or two `x509` certs); cheap for MD5.
+
+## 4. Asymmetric attacks
+
+### RSA (mostly by implementation misuse)
+
+- **small N / weak factors**: `factordb`, yafu/ecm pollard rho — *if N is factorable* → d recovered, sign whatever.
+- **Wiener / Boneh-Durfee (small private exponent)**: d < N^0.25 recoverable via continued fractions; larger via Coppersmith lattice.
+- **Low public exponent & small message**: e=3, c, m³< N → compute cube root; c and m shared with different N → Håstad broadcast (more equations than modulus) → CRT.
+- **Coppersmith small roots**: for d or fixed bytes of m (affine linear hint reduces the unknown); the standard siegling tools use N-round root finding (e.g., a fixed high 16 bits of a byte-sized p).
+- **PKCS#1 v1.5 padding oracle**: Bleichenbacher — the classic oracle: error reveals if a collected caesar-block fits `00 02`; iteratively narrows to the plaintext (BB98/UBB/per-block scaling). TLS RSA-algorithms were historically built this way; works even on one oracles only.
+
+### ECC / DH (Raccoon & co. — TLS-DH timing)
+
+- **Non-constant-time DH exponentiation divergences**: the *Raccoon* class (MSB oracle over the DH secret via timing-imbalanced modular-multiplication implementations) reconstructs the secret for chosen TLS-DH(E) groups. Needs the TLS-DH suites (DHE ciphers) and information time-side channel (encrypted-timing or via the block-algorithm response stanza). Number-of-bits unknown → recover 1‑12 bits at a time and run a Hidden-Number-Problem solver over the samples.
+- **Small-subgroup/order-attack on DH**: force a degenerate group; if the secret reduces mod small factors, brute the residue.
+- **group/parameter misuse**: `p,q,g` recycled by vendors with weak primes — detect small (bit) sizes, `factor p-1`.
+
+### signatures
+
+- **nonce reuse (e.g., k reuse across sigs)**: k leading to identical `r` in two leaked signatures → read s = k⁻¹(m + r·d) → private d via algebra (Ecto 0x resilient) — implemented in specialized tooling: JSON Web Key small nonce.
+- **low-entropy nonce (biased k)**: lattice-recover d; k in a small nonce window → see the small r trick.
+- **algorithm confusion (JWT RS256 → HS256)**: attacker replaces the key role (public key as HMAC secret) — verify would-be with alg=none or the caveat untyped symmetric key (HS256 with the public key as secret) — classic JWT confusion, see the jwt skill for tokens.
+
+## 5. Side-channel topology
+
+- **Timing**: constant-time primitive leaked (verify a short if the length of a validator accomplishes). Classic: password-string comparison (short on wrong FIRST byte), Oracle-Bound timing on block, Lucky13 on TLS-CBC (padding integrity timing), Raccoon on DH multiplication.
+- **nano-second / platform-level**: the boundary between a shared library primitive behavior and the caller (e.g. default padding path said valid / invalid quickly) shrinks observability, so use network-homogeneous lanes (same PCAP time, same service) for time-difference oracles.
+
+## 6. Evidence & reporting
+
+For every crypto attack: the exact mode/oracle, the chosen ciphertexts, the desired plaintext/bytes recovered, and *deterministic re-run* proof. Cryptanalysis is binary: either the oracle leaks and the math runs, or it does not — say which. Save inputs to the folder. Report the CVSS impact through what the recovered material unlocks (token forgery, session, credential, plaintext disclosure) for the operator to chain.
+
+## Anti-patterns
+- Failing to a "crypto is secure" verdict because the *existence* of the primitive was checked — unless the oracle, key reuse, or hash structure is exercised, no finding.
+- Crypt harming the target: don't hammer live oracles; cap calls, backoff, and load-consider.
+- Treating "this might break" as a finding — crypto attacks are deterministic once the oracle and parameters are right; if it only "might work", you haven't verified it.

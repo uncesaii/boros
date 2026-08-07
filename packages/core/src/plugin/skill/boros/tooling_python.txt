@@ -1,6 +1,6 @@
 # Python In The Sandbox
 
-Use `exec_command` for Python. There is no separate Strix Python executor.
+Use `exec_command` for Python. There is no separate Boros Python executor.
 
 Prefer writing reusable scripts to a `.py` file and running them with
 `python3 <name>.py`. For short one-off transformations, `python3 -c` or a
@@ -16,7 +16,7 @@ take `-e` not `-c` so they fail even with `login=False`.
 
 ## Proxy Automation From Python
 
-The sandbox image includes an installed `caido_api` module. Import it
+The runtime image includes an installed `caido_api` module. Import it
 explicitly when Python code needs Caido traffic or replay access:
 
 ```python
@@ -87,7 +87,7 @@ For iterative exploit work, put code in a file:
 
 ## Installing extra packages
 
-The sandbox's Python lives in `/app/.venv`, and it is the active virtualenv
+The operator box's Python lives in `/app/.venv`, and it is the active virtualenv
 (`python3` / `pip` already resolve to it). The following common libraries are
 **pre-installed** — import them directly, no install step needed:
 `requests`, `httpx`, `beautifulsoup4` (`bs4`), `lxml`, `pyjwt` (`jwt`),

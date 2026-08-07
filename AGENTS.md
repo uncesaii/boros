@@ -1,3 +1,29 @@
+# Boros
+
+Boros is a production-grade, terminal-native offensive-security agent swarm. It
+is built on the OpenCode terminal AI shell (base: anomalyco/opencode), which
+provides the TUI, install/auto-update pipeline, and CI/CD, and adds a native
+agent swarm purpose-built for offensive security operations.
+
+**What this is:** a single binary (`boros`) that runs an autonomous red-team
+swarm in your terminal. It ships a root doctrine agent plus specialist
+subagents (recon, exploit, privesc, web, triage, assistant) and a large library
+of offensive-security skills. Bare `boros` = the full swarm doctrine; no
+configuration required.
+
+**Goal:** a self-orchestrating offensive-security agent that can run a full
+engagement — reconnaissance, exploitation, privilege escalation, web-target
+triage — autonomously, with every step human-reviewable in the terminal.
+
+- The core is Effect v4 (`effect` catalog), with the package graph directed
+  Schema → Core → Protocol → Server; the CLI lives in `packages/opencode`.
+- CI gates every change: `bun typecheck`, `bun turbo test`, and a build smoke
+  via `ci.yml`; releases are tag-driven (`v*` → native binaries for 12
+  platforms + npm publishing).
+- The runtime intentionally preserves all real provider `/model` and
+  `/connect` behavior from the OpenCode base; only the OpenCode rate-limit
+  upsell paths are stripped.
+
 - To regenerate the legacy JavaScript SDK, run `./packages/sdk/js/script/build.ts`.
 - After changing the public Protocol or Server `HttpApi`, run `bun run generate` from `packages/client`. Do not edit `src/generated` or `src/generated-effect` directly.
 - Keep runtime dependencies directed from Schema to Core and Protocol, then from Core and Protocol to Server. Client runtime code may depend on Schema and Protocol but never Core or Server; `sdk-next` composes Client, Core, and Server.
@@ -208,3 +234,9 @@ When the Boros agent reviews a PR, it checks:
 2. All real provider `/model` and `/connect` behavior is preserved.
 3. No OpenCode-only cloud endpoints are introduced into the terminal path.
 4. Native agent/skill registration is consistent with `AGENTS.md` conventions.
+
+## References
+
+- Base / shell: OpenCode — https://github.com/anomalyco/opencode
+- Flow: Strix — https://github.com/usestrix/strix
+- Exodus — https://github.com/exodialabsxyz/exodus

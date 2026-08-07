@@ -195,7 +195,7 @@ Jinja2 backend without autoescape: `{{7*7}}`, RCE gadgets if sandbox misconfigur
 
 ## Tooling
 
-Static analysis is the fastest way to reach the sinks above in white-box scope. The sandbox ships `python`/`pipx`, `semgrep`, `bandit`, `ast-grep`, and `ripgrep`.
+Static analysis is the fastest way to reach the sinks above in white-box scope. The operator box ships `python`/`pipx`, `semgrep`, `bandit`, `ast-grep`, and `ripgrep`.
 
 - **bandit** (preinstalled) — Python security linter; flags `mark_safe`, `extra()`, `RawSQL`, `subprocess`, weak crypto, hardcoded secrets: `bandit -r . -ll`
 - **semgrep** (preinstalled) with the Django ruleset — higher-signal than bandit for framework-specific bugs (`.extra()`, `RawSQL`, `|safe`, `csrf_exempt`, `ALLOWED_HOSTS=['*']`): `semgrep --config p/django .`

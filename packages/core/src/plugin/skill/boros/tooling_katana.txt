@@ -85,7 +85,7 @@ Failure recovery:
 If uncertain, query web_search with:
 `site:docs.projectdiscovery.io katana <flag> usage`
 
-Complementary crawlers / JS endpoint extractors in the sandbox:
+Complementary crawlers / JS endpoint extractors on the operator box:
 - `gospider -s https://target.tld -d 3 -c 10 -t 20` — alternate crawler;
   picks up things Katana misses on weird sites; use it as a second
   pass when Katana output looks thin.

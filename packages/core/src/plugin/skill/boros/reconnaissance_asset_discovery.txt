@@ -49,7 +49,7 @@ CT logs record nearly every publicly-trusted certificate. Query by domain (match
 
 ## Recommended Tooling
 
-These tools are available in the sandbox and are pipeline-friendly with JSON output:
+These tools are available on the operator box and are pipeline-friendly with JSON output:
 
 - **`subfinder`** — passive subdomain aggregation across many sources incl. CT: `subfinder -d example.com -all -recursive -silent -oJ -o subs.jsonl`
 - **`httpx`** — live probing plus cert/SAN grab in one pass: `httpx -l hosts.txt -tls-grab -json` (see methodology).
@@ -59,7 +59,7 @@ These tools are available in the sandbox and are pipeline-friendly with JSON out
 - **`dig`** / **`nslookup`** — forward/reverse (PTR) resolution and CNAME chains.
 - **`whois`** — ASN/netblock lookups (e.g. `whois -h whois.cymru.com`).
 
-Cross-source results — CT + passive DNS + `subfinder` together beat any single source. If you need a tool that is not installed, install it into the sandbox at runtime.
+Cross-source results — CT + passive DNS + `subfinder` together beat any single source. If you need a tool that is not installed, install it into the operator box at runtime.
 
 ## Key Techniques
 
