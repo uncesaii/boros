@@ -22,8 +22,8 @@ process.env.OPENCODE_DB = exerciseDatabasePath
 Flag.OPENCODE_DB = exerciseDatabasePath
 
 export const original = {
-  OPENCODE_SERVER_PASSWORD: Flag.OPENCODE_SERVER_PASSWORD,
-  OPENCODE_SERVER_USERNAME: Flag.OPENCODE_SERVER_USERNAME,
+  BOROS_SERVER_PASSWORD: Flag.BOROS_SERVER_PASSWORD,
+  BOROS_SERVER_USERNAME: Flag.BOROS_SERVER_USERNAME,
 }
 
 export const cleanupExercisePaths = Effect.promise(async () => {

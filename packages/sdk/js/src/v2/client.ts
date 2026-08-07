@@ -22,7 +22,7 @@ function rewrite(request: Request, values: { directory?: string; workspace?: str
   let changed = false
 
   for (const [name, key] of [
-    ["x-opencode-directory", "directory"],
+    ["x-boros-directory", "directory"],
     ["x-opencode-workspace", "workspace"],
   ] as const) {
     const value = pick(
@@ -42,7 +42,7 @@ function rewrite(request: Request, values: { directory?: string; workspace?: str
   if (!changed) return request
 
   const next = new Request(url, request)
-  next.headers.delete("x-opencode-directory")
+  next.headers.delete("x-boros-directory")
   next.headers.delete("x-opencode-workspace")
   return next
 }
@@ -63,7 +63,7 @@ export function createOpencodeClient(config?: Config & { directory?: string; exp
   if (config?.directory) {
     config.headers = {
       ...config.headers,
-      "x-opencode-directory": encodeURIComponent(config.directory),
+      "x-boros-directory": encodeURIComponent(config.directory),
     }
   }
 
