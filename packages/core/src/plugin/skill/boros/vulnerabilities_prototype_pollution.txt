@@ -124,7 +124,7 @@ Gadget availability depends on package versions — enumerate `node_modules` in 
 
 ## Tooling
 
-Detection is mostly about payload shapes (above) plus a couple of light helpers. The sandbox has `go` and `nuclei`; `ppfuzz` is a single static binary.
+Detection is mostly about payload shapes (above) plus a couple of light helpers. The operator box has `go` and `nuclei`; `ppfuzz` is a single static binary.
 
 - **ppfuzz** (dwisiswant0) — fast client-side prototype-pollution fuzzer (Rust, single binary); good for spraying the URL/param shapes across many endpoints: `ppfuzz -l urls.txt`
 - **nuclei** (preinstalled) — has prototype-pollution templates for quick triage: `nuclei -u https://target -tags prototype-pollution`

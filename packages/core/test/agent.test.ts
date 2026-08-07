@@ -120,11 +120,15 @@ describe("AgentV2", () => {
           "assistant",
           "build",
           "compaction",
+          "crypto",
           "explore",
           "exploit",
           "exploit-engineer",
           "general",
+          "harness",
+          "llm",
           "plan",
+          "post",
           "privesc",
           "recon",
           "summary",
@@ -139,7 +143,7 @@ describe("AgentV2", () => {
       for (const id of ["build", "compaction", "explore", "general", "plan", "summary", "title", "triage"]) {
         expect(hasExplicitBash(id)).toBe(false)
       }
-      for (const id of ["recon", "exploit", "exploit-engineer", "privesc", "web", "assistant"]) {
+      for (const id of ["recon", "exploit", "exploit-engineer", "privesc", "web", "assistant", "crypto", "llm", "post", "harness"]) {
         expect(hasExplicitBash(id)).toBe(true)
       }
     }),

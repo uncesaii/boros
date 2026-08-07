@@ -5,7 +5,7 @@ Playwright or Puppeteer dependency. Accessibility-tree snapshots with compact
 `@eN` refs let agents interact with pages in ~200-400 tokens instead of
 parsing raw HTML.
 
-Pre-installed in the sandbox image. Always invoke via the
+Pre-installed on the operator box image. Always invoke via the
 ``exec_command`` shell tool. The Caido HTTP/HTTPS proxy is already
 wired via ``http_proxy`` / ``https_proxy`` env vars — **do not pass
 ``--proxy``**; agent-browser picks it up automatically and Caido
@@ -234,7 +234,7 @@ only for simple expressions.
 
 ### Screenshot
 
-`agent-browser screenshot` writes a PNG to disk in the sandbox. The
+`agent-browser screenshot` writes a PNG to disk on the operator box. The
 shell command alone does **not** put the image into your context —
 chain it with the SDK ``view_image`` tool to actually see it:
 

@@ -41,6 +41,11 @@ import {
   BOROS_WEB,
   BOROS_TRIAGE,
   BOROS_ASSISTANT,
+  BOROS_EXPLOIT_ENGINEER,
+  BOROS_CRYPTO,
+  BOROS_LLM,
+  BOROS_POST,
+  BOROS_HARNESS,
 } from "@opencode-ai/core/plugin/agent/prompt/boros-doctrine"
 
 export const Info = Schema.Struct({
@@ -430,6 +435,96 @@ const layer = Layer.effect(
                 webfetch: "allow",
                 websearch: "allow",
                 bash: "allow",
+              }),
+              user,
+            ),
+          },
+          crypto: {
+            name: "crypto",
+            description:
+              "Cryptography operator — attacks the crypto layer: TLS/key exchange, cipher modes, tokens/signatures, hashes/brute-forcing, nonce/IV misuse — from oracle attacks (padding, Bleichenbacher, Raccoon-class timing) to offline property breaks.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "secondary",
+            prompt: BOROS_CRYPTO + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          llm: {
+            name: "llm",
+            description:
+              "AI/LLM red team operator — prompt injection, jailbreaking, RAG/system-leak, tool/MCP abuse, agent confused-deputy, model attacks on LLM apps.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "info",
+            prompt: BOROS_LLM + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          post: {
+            name: "post",
+            description:
+              "Post-Exploitation operator — credential access, persistence, lateral movement, pivoting/tunneling, C2 flow, evasion, cleanup after a foothold.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "warning",
+            prompt: BOROS_POST + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          harness: {
+            name: "harness",
+            description:
+              "Harness Engineer operator — builds reusable attack machinery: intercepting proxies, target drivers, fuzz harnesses, exploit scaffolds, oracle loops, payload factories.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "success",
+            prompt: BOROS_HARNESS + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+                edit: "allow",
+                write: "allow",
               }),
               user,
             ),

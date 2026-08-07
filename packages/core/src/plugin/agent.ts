@@ -17,6 +17,10 @@ import {
   BOROS_TRIAGE,
   BOROS_ASSISTANT,
   BOROS_EXPLOIT_ENGINEER,
+  BOROS_CRYPTO,
+  BOROS_LLM,
+  BOROS_POST,
+  BOROS_HARNESS,
 } from "./agent/prompt/boros-doctrine"
 
 const TRUNCATION_GLOB = path.join(Global.Path.data, "tool-output", "*")
@@ -254,6 +258,80 @@ export const Plugin = define({
         item.system = BOROS_EXPLOIT_ENGINEER + "\n\n" + BOROS_DOCTRINE
         item.mode = "subagent"
         item.color = "error"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "edit", resource: "*", effect: "allow" },
+            { action: "write", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
+      })
+
+      draft.update(AgentV2.ID.make("crypto"), (item) => {
+        item.description =
+          "Cryptography operator — attacks the crypto layer: TLS/key exchange, cipher modes, tokens/signatures, hashes/brute-forcing, nonce/IV misuse — from oracle attacks (padding, Bleichenbacher, Raccoon-class timing) to offline property breaks."
+        item.system = BOROS_CRYPTO + "\n\n" + BOROS_DOCTRINE
+        item.mode = "subagent"
+        item.color = "secondary"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
+      })
+
+      draft.update(AgentV2.ID.make("llm"), (item) => {
+        item.description =
+          "AI/LLM red team operator — prompt injection, jailbreaking, RAG/system-leak, tool/MCP abuse, agent confused-deputy, model attacks on LLM apps."
+        item.system = BOROS_LLM + "\n\n" + BOROS_DOCTRINE
+        item.mode = "subagent"
+        item.color = "info"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
+      })
+
+      draft.update(AgentV2.ID.make("post"), (item) => {
+        item.description =
+          "Post-Exploitation operator — credential access, persistence, lateral movement, pivoting/tunneling, C2 flow, evasion, cleanup after a foothold."
+        item.system = BOROS_POST + "\n\n" + BOROS_DOCTRINE
+        item.mode = "subagent"
+        item.color = "warning"
+        item.permissions.push(
+          ...PermissionV2.merge(defaults, [
+            { action: "bash", resource: "*", effect: "allow" },
+            { action: "webfetch", resource: "*", effect: "allow" },
+            { action: "websearch", resource: "*", effect: "allow" },
+            { action: "skill", resource: "*", effect: "allow" },
+            { action: "todowrite", resource: "*", effect: "allow" },
+            { action: "question", resource: "*", effect: "allow" },
+          ]),
+        )
+      })
+
+      draft.update(AgentV2.ID.make("harness"), (item) => {
+        item.description =
+          "Harness Engineer operator — builds reusable attack machinery: intercepting proxies, target drivers, fuzz harnesses, exploit scaffolds, oracle loops, payload factories."
+        item.system = BOROS_HARNESS + "\n\n" + BOROS_DOCTRINE
+        item.mode = "subagent"
+        item.color = "success"
         item.permissions.push(
           ...PermissionV2.merge(defaults, [
             { action: "bash", resource: "*", effect: "allow" },

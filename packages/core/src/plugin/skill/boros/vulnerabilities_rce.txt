@@ -36,7 +36,7 @@ Remote code execution leads to full server control when input reaches code execu
 
 ### OAST
 
-Use `interactsh-client -v` in the sandbox to mint a unique callback
+Use `interactsh-client -v` on the operator box to mint a unique callback
 domain (`*.oast.fun`); substitute it for `attacker.tld` below. Each
 invocation prints inbound DNS/HTTP hits to stdout in real time.
 
@@ -234,7 +234,7 @@ pop graphic-context
 
 ## Tooling
 
-- Reverse-shell listener: `ncat -lvnp 4444` (in the sandbox; `ncat` is the
+- Reverse-shell listener: `ncat -lvnp 4444` (on the operator box; `ncat` is the
   netcat variant that ships in the image). Pair with a one-shot shell
   payload only when OAST + selective reads are insufficient — never
   drop a persistent shell when a single targeted command will prove it.

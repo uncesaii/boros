@@ -23,7 +23,7 @@ Run from the repo root and store output in the shared artifact directory used by
 the source-aware pass:
 
 ```bash
-ART=/workspace/.strix-source-aware
+ART=/workspace/.boros-source-aware
 mkdir -p "$ART"
 
 # Record the vuln DB age so a stale DB is a visible signal, not a silent clean scan.
@@ -31,7 +31,7 @@ trivy version --format json 2>/dev/null | tee "$ART/trivy-version.json"
 # inspect .VulnerabilityDB.UpdatedAt / NextUpdate
 
 # Lockfile/manifest -> known-CVE matching. Try a best-effort DB refresh first so a
-# sandbox with egress gets the freshest CVEs; if the update fails, fall back to the
+# with egress gets the freshest CVEs; if the update fails, fall back to the
 # cached DB instead of failing the scan. --offline-scan keeps per-package advisory
 # lookups offline.
 trivy fs --scanners vuln --timeout 30m --offline-scan \
@@ -41,7 +41,7 @@ trivy fs --scanners vuln --timeout 30m --offline-scan \
   || true
 ```
 
-If `.VulnerabilityDB.UpdatedAt` is more than a few weeks old (the sandbox had no
+If `.VulnerabilityDB.UpdatedAt` is more than a few weeks old (the operator box had no
 egress to refresh it), treat it as a scan limitation and note it in the
 `assumptions` of dependency findings — a stale DB that still returns *some* results
 will not trip the "zero results is suspicious" heuristic, so its age is the only

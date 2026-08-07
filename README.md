@@ -62,17 +62,30 @@ evidence:
 - **exploit-engineer** — exploit development: reverse-engineering, patch-diffing, fuzzing, sanitizer-confirmed PoCs, deterministic exploit code
 - **privesc** — drives a foothold to root/SYSTEM/Domain Admin and proves it
 - **web** — breaks web apps/APIs: RCE, SQLi, SSRF, XSS, auth bypass, IDOR, with request/response evidence
+- **crypto** — attacks the cryptography layer: cipher modes, tokens/signatures, TLS/key exchange, nonce/IV misuse, oracle attacks, hash brute-forcing
+- **llm** — AI/LLM red team: prompt injection, jailbreaking, RAG/system leakage, tool & MCP abuse, agent confused-deputy attacks
+- **post** — post-exploitation: credential access, persistence, lateral movement, pivoting, C2 flow, evasion, cleanup
 - **assistant** — force multiplier: tooling, payload development, credential/foothold management, reporting
+
+Specialists are *subagents*: they run one focused objective and return evidence, and
+they are spawned by the root operator or directly by you in the chat. Skills are the
+loadable methodology playbooks (see below); agents are the actors that decide which
+methods and steps to use.
 
 ### Skills
 
-Boros includes 60 built-in kill-chain skills (slash commands) — recon, scan modes, cloud
+Boros includes 64 built-in kill-chain skills (slash commands) — recon, scan modes, cloud
 (AWS/GCP/Kubernetes), Active Directory, framework + protocol playbooks (Django, FastAPI,
 GraphQL, OAuth), all major CWE classes (SQLi, SSRF, XSS, SSTI, XXE, deserialization, RCE,
-race conditions…), and a full exploit-development playbook (patch-diff, fuzz + sanitizers,
-ROP/heap primitives, deterministic PoC). Type `/` in the TUI to browse the catalog, or
-`/help` for the list. Skills are built-in, ship with the binary, and need no network
-lookups. They live in `packages/core/src/plugin/skill/boros/`.
+race conditions…), an AI/LLM red-team playbook (prompt injection, jailbreaking, MCP/agent
+abuse), a cryptography attack playbook (padding oracles, CBC bit-flipping, length
+extension, RSA/DH misuse, side-channels), a post-exploitation playbook (credential access,
+persistence, lateral movement, C2), a harness-engineering playbook (reusable attack
+machinery: proxies, drivers, fuzz harnesses, exploit scaffolds), and a full
+exploit-development playbook (patch-diff, fuzz + sanitizers, ROP/heap primitives,
+deterministic PoC). Type `/` in the TUI to browse the catalog, or `/help` for the list.
+Skills are built-in, ship with the binary, and need no network lookups. They live in
+`packages/core/src/plugin/skill/boros/`.
 
 ### Building from source
 

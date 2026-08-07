@@ -163,7 +163,7 @@ com.app://callback  (mobile custom scheme)
 
 ## Tooling
 
-The sandbox ships **jwt_tool** (already cloned at `/home/pentester/tools/jwt_tool`) plus `curl` — enough for the token side of OAuth/OIDC.
+The operator box ships **jwt_tool** (already cloned at `/home/pentester/tools/jwt_tool`) plus `curl` — enough for the token side of OAuth/OIDC.
 
 - **jwt_tool** (ticarpi) — inspect and tamper ID tokens / JWT access tokens: `alg:none`, `HS256`/`RS256` key confusion, `kid` injection, claim editing (`sub`, `aud`, `iss`, `exp`):
   ```

@@ -1,0 +1,89 @@
+# Harness Engineering — the craft of building attack machinery
+
+Boros is a hacking agent/framework: every engagement runs on code we engineer. A **harness** is reusable machinery that drives an attack target or an attack surface: intercepting proxies, target drivers, fuzz harnesses, exploit scaffolds, replay loops, beacon/callback systems, and payload factories. Harnesses are what turn one-off curl commands into a repeatable, observable, debuggable attack pipeline. If you are about to run the same command twice, build a harness for it.
+
+Use this skill when the engagement needs engineering: writing an exploit driver, wrapping a target protocol for fuzzing, building an interception proxy, automating a multi-step attack, or generalizing a one-off payload into a tool.
+
+## 0. Decide: is a harness worth it?
+
+Build one when any of these hold; otherwise keep the one-liner:
+
+- The attack must repeat (multiple hosts, multiple inputs, retries, iteration)
+- The attack needs observability (logging, request/response capture, state dumps, callbacks)
+- The attack needs adaptivity (response-driven branching, oracle loops, brute-forcing)
+- The attack is complex enough that mistakes need a debug story
+- The payload needs to be maintained/parameterized across attempts
+
+## 1. The Harness Contract
+
+Every harness ships with the same skeleton. Make it a directory, not a file:
+
+```
+harn/<name>/
+  run.py            # entrypoint: takes target + options, drives the attack
+  core.py           # the attack logic (protocol, payloads, oracles, state)
+  payloads/         # payloads, templates, wordlists (seeded, parameterized)
+  out/              # evidence: logs, captures, proof artifacts
+  README.md         # how to run, what it proves, how to extend
+```
+
+Rules:
+
+- `run.py` reads everything from argv/env/config — never hardcode the target, creds, or scope.
+- `core.py` separates the attack loop from I/O: the loop is testable without a live target (dry-run mode), and I/O is swappable (file/network/process).
+- Evidence goes to `out/` with a timestamped name; the harness prints the evidence path at the end.
+- Exit codes are meaningful: 0 = attack reached the objective, 1 = attack ran but no result, 2 = harness misconfigured, 3 = target unreachable.
+- Idempotent re-run: same input -> same-shaped output (timestamps vary, structure doesn't).
+
+## 2. Harness Patterns (pick per objective — decide yourself, don't just use the first)
+
+### 2.1 Target driver / protocol harness
+For speaking a protocol or API to a target: auth, request construction, response parsing, state carried across calls. Skeleton:
+
+```python
+class Target:
+    def __init__(self, base, creds=None, timeout=10): ...
+    def req(self, method, path, **kw): ...       # single request w/ logging + retry
+    def auth(self): ...                          # obtain + cache session token
+    def state(self): ...                         # return attacker-relevant state
+```
+
+### 2.2 Interception / MITM proxy harness
+For standing between a client and a service to mutate, replay, or observe traffic. Python: build on `http.server`/`socketserver` or `mitmproxy` addons; for binary protocols wrap `socket`. Capabilities to include: request log, match-replace rules (headers, bodies), replay from log, pause-and-edit.
+
+### 2.3 Fuzz harness (in-process or driver)
+For feeding a target parser: coverage-guided with libFuzzer/AFL++ (compile the target's parser with `-fsanitize=fuzzer,address` and link the harness) or black-box with custom mutators driving the target's stdin/network/file input. The harness must: seed corpus from real samples, classify crashes (dedupe by stack), and shrink crashing inputs (`afl-tmin`/`llvm-reduce`).
+
+### 2.4 Oracle / brute-force harness
+For attacks that need a yes/no or score signal: padding oracles, blind injection, timing, rate-limited guessing. The harness loops: craft input -> query oracle -> classify response -> adapt next input (binary search, threaded parallelization with backoff, resume-from-state).
+
+### 2.5 Exploit scaffold
+For turning a confirmed primitive into an exploit: pwntools-based driver with `remote()`/`process()` switch, staged payloads, GDB attach mode for debugging, and a `--verify` mode that asserts the win condition (uid, flag, RCE output).
+
+### 2.6 Callback / C2 beacon harness
+For keeping a foothold observable: reverse-shell handler, webhook/callback listener (or interactsh client), beacon loop with jitter, session state persistence. Keep it minimal and evidence-first; prefer OS-native or standard tools (ncat, socat) unless the engagement needs something custom.
+
+### 2.7 Payload factory
+For parameterizing payload generation: one input (target/version/arch/os) -> tailored payloads. Templates + variables, not string soup. Version-aware (generate for the exact target), architecture-aware, and encoded/obfuscated on demand. The factory output goes into `payloads/` and the evidence into `out/`.
+
+## 3. Engineering discipline (same as code engineering, applied to attacks)
+
+- **Test the harness, then test the target.** Run `--dry-run` against a recorded fixture; assert the harness logic before pointing it at anything live.
+- **Log everything, structured.** One line per request/action with timestamps; capture full request/response for anything that matters (evidence).
+- **Fail loudly, recover silently.** On error, print the state, keep the log; retry with backoff only where the target tolerates it.
+- **Parameterize, don't hardcode.** Scope, creds, rate limits, timeouts are inputs. A harness with the target baked in is a liability, not a tool.
+- **Respect the target's load.** Default rate limits; add `--rate` flags; never hammer availability (OPSEC).
+- **Make it resumable.** Checkpoint state (progress file, last offset) so an interrupted run resumes, not restarts.
+- **Leave the evidence trail.** Every harness run writes `out/` artifacts: logs, captures, proofs. Report the paths, and only claim what the artifacts show.
+- **Reuse over re-invent.** Prefer battle-tested machinery (`pwntools`, `mitmproxy`, `impacket`, `ncat`, `interactsh-client`) over reimplementing; extend what exists when it fits.
+
+## 4. Language and tool choices
+
+- Python is the default for harnesses (rich ecosystem: `pwntools`, `requests`, `socket`, `mitmproxy`, `scapy` for packet-level work). Use `python3` from the operator box.
+- Go/Rust when a harness must be a single static binary (deploy to a target, avoid dependencies).
+- Shell for one-shot automation that doesn't need state (but if it grows, it becomes a harness).
+- Choose the language by the deployment reality (where the harness runs: operator box vs target host), not by preference.
+
+## 5. Deliverable standard
+
+A harness is done when: it runs end-to-end from a clean checkout with only documented args, it produces evidence in `out/`, it has a README stating what it does, what it proves, and how to extend it, and its exit codes distinguish success from failure. Hand the harness (path + README) to the orchestrator with the evidence it produced. If the objective is not reached, the harness still has value: it is the repeatable probe the next operator (or agent) runs after refinement.

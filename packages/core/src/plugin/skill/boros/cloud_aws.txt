@@ -203,7 +203,7 @@ curl http://169.254.169.254/latest/user-data
 
 ## Tooling
 
-Prefer credential-light, install-once CLIs. The sandbox has `awscli`/`python`/`pipx`/`go` and build-time egress.
+Prefer credential-light, install-once CLIs. The operator box ships `awscli`/`python`/`pipx`/`go` and build-time egress.
 
 - **awscli** — the primary enumeration tool (used throughout this skill). Always start with `aws sts get-caller-identity`.
 - **enumerate-iam** (andresriancho) — tiny script that brute-forces which API calls a set of keys can make when you can't read your own policy:
