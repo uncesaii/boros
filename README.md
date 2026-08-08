@@ -65,6 +65,7 @@ evidence:
 - **crypto** — attacks the cryptography layer: cipher modes, tokens/signatures, TLS/key exchange, nonce/IV misuse, oracle attacks, hash brute-forcing
 - **llm** — AI/LLM red team: prompt injection, jailbreaking, RAG/system leakage, tool & MCP abuse, agent confused-deputy attacks
 - **post** — post-exploitation: credential access, persistence, lateral movement, pivoting, C2 flow, evasion, cleanup
+- **harness** — harness engineering: reusable attack machinery (proxies, target drivers, fuzz harnesses, exploit scaffolds, oracle loops, payload factories)
 - **assistant** — force multiplier: tooling, payload development, credential/foothold management, reporting
 
 Specialists are *subagents*: they run one focused objective and return evidence, and
@@ -99,7 +100,23 @@ bun run --cwd packages/opencode script/build.ts --single
 
 ### Contributing
 
-All changes go through a pull request into `main`; `main` is protected (review
-required, CI must be green) and every commit lives on a date-stamped branch. See
-[`AGENTS.md`](./AGENTS.md) for the workflow, style guide, and the offensive-agent
-review scope.
+All changes go through a pull request into `main`; `main` is protected (CI must be
+green) and every commit lives on a date-stamped branch. See
+[`AGENTS.md`](./AGENTS.md) for the workflow and style guide.
+
+### Legal and acceptable use
+
+Boros is offensive-security software. It can attack, break into, and take over
+systems.
+
+- **You are responsible for your use.** Only operate Boros against systems you own
+  or have explicit, written authorization to test.
+- **Unauthorized use is illegal.** Attacking computers, networks, or services that
+  you do not own and do not have permission to test is a crime in most
+  jurisdictions, regardless of intent or outcome.
+- **No warranty, no liability.** This software is provided "as is", without
+  warranty of any kind. The author and contributors are not obligated to help you,
+  and are not liable for any damage, loss, or legal consequence arising from your
+  use of this software.
+- **Authorization is your problem.** Establishing and preserving a lawful
+  engagement scope is the operator's responsibility, never the tool's.

@@ -28,12 +28,12 @@ import { RunPermissionBody } from "./footer.permission"
 import { RunQuestionBody } from "./footer.question"
 import { footerWidthPolicy } from "./footer.width"
 import {
-  OPENCODE_BASE_MODE,
+  BOROS_BASE_MODE,
   formatKeyBindings,
   formatKeySequence,
   useBindings,
   useKeymapSelector,
-  type OpenTuiKeymap,
+  type BorosTuiKeymap,
 } from "@opencode-ai/tui/keymap"
 import type {
   FooterPromptRoute,
@@ -180,7 +180,7 @@ export function RunFooterView(props: RunFooterViewProps) {
     return current.type === "subagent" ? subagent().details[current.sessionID] : undefined
   })
   const command = useKeymapSelector(
-    (keymap: OpenTuiKeymap) =>
+    (keymap: BorosTuiKeymap) =>
       formatKeySequence(
         keymap
           .getCommandBindings({ visibility: "registered", commands: ["command.palette.show"] })
@@ -189,7 +189,7 @@ export function RunFooterView(props: RunFooterViewProps) {
       ) ?? "",
   )
   const subagentShortcut = useKeymapSelector(
-    (keymap: OpenTuiKeymap) =>
+    (keymap: BorosTuiKeymap) =>
       formatKeySequence(
         keymap
           .getCommandBindings({ visibility: "registered", commands: ["session.child.first"] })
@@ -198,7 +198,7 @@ export function RunFooterView(props: RunFooterViewProps) {
       ) ?? "",
   )
   const queuedShortcut = useKeymapSelector(
-    (keymap: OpenTuiKeymap) =>
+    (keymap: BorosTuiKeymap) =>
       formatKeySequence(
         keymap
           .getCommandBindings({ visibility: "registered", commands: ["session.queued_prompts"] })
@@ -207,7 +207,7 @@ export function RunFooterView(props: RunFooterViewProps) {
       ) ?? "",
   )
   const backgroundShortcut = useKeymapSelector(
-    (keymap: OpenTuiKeymap) =>
+    (keymap: BorosTuiKeymap) =>
       formatKeySequence(
         keymap
           .getCommandBindings({ visibility: "registered", commands: ["session.background"] })
@@ -216,7 +216,7 @@ export function RunFooterView(props: RunFooterViewProps) {
       ) ?? "",
   )
   const interrupt = useKeymapSelector(
-    (keymap: OpenTuiKeymap) =>
+    (keymap: BorosTuiKeymap) =>
       formatKeySequence(
         keymap
           .getCommandBindings({ visibility: "registered", commands: ["session.interrupt"] })
@@ -225,14 +225,14 @@ export function RunFooterView(props: RunFooterViewProps) {
       ) ?? "",
   )
   const variantCycle = useKeymapSelector(
-    (keymap: OpenTuiKeymap) =>
+    (keymap: BorosTuiKeymap) =>
       formatKeyBindings(
         keymap.getCommandBindings({ visibility: "registered", commands: ["variant.cycle"] }).get("variant.cycle"),
         props.tuiConfig,
       ) ?? "",
   )
   const clearShortcut = useKeymapSelector(
-    (keymap: OpenTuiKeymap) =>
+    (keymap: BorosTuiKeymap) =>
       formatKeySequence(
         keymap.getCommandBindings({ visibility: "registered", commands: ["prompt.clear"] }).get("prompt.clear")?.[0]
           ?.sequence,
@@ -498,7 +498,7 @@ export function RunFooterView(props: RunFooterViewProps) {
   })
 
   useBindings(() => ({
-    mode: OPENCODE_BASE_MODE,
+    mode: BOROS_BASE_MODE,
     enabled: active().type === "prompt" && route().type === "composer" && !composer.visible(),
     commands: [
       {
@@ -521,7 +521,7 @@ export function RunFooterView(props: RunFooterViewProps) {
   }))
 
   useBindings(() => ({
-    mode: OPENCODE_BASE_MODE,
+    mode: BOROS_BASE_MODE,
     enabled: active().type === "prompt" && route().type === "composer" && foregroundSubagents(),
     priority: 1,
     commands: [
@@ -536,7 +536,7 @@ export function RunFooterView(props: RunFooterViewProps) {
   }))
 
   useBindings(() => ({
-    mode: OPENCODE_BASE_MODE,
+    mode: BOROS_BASE_MODE,
     enabled: active().type === "prompt" && route().type === "composer" && tabs().length > 0,
     commands: [
       {
@@ -550,7 +550,7 @@ export function RunFooterView(props: RunFooterViewProps) {
   }))
 
   useBindings(() => ({
-    mode: OPENCODE_BASE_MODE,
+    mode: BOROS_BASE_MODE,
     enabled: active().type === "prompt" && route().type === "composer" && queuedPrompts().length > 0,
     commands: [
       {

@@ -48,10 +48,10 @@ jobs:
           npm whoami
       - name: Build native binaries (no GH release upload)
         env:
-          OPENCODE_VERSION: ${{ steps.version.outputs.version }}
-          OPENCODE_CHANNEL: latest
+          BOROS_VERSION: ${{ steps.version.outputs.version }}
+          BOROS_CHANNEL: latest
         run: |
-          # NOTE: deliberately NOT setting OPENCODE_RELEASE so build.ts skips gh release upload
+          # NOTE: deliberately NOT setting BOROS_RELEASE so build.ts skips gh release upload
           bun run --cwd packages/opencode script/build.ts --skip-embed-web-ui
       - name: Publish platform binary packages
         run: |

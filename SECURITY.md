@@ -6,23 +6,52 @@ We do not accept AI generated security reports. We receive a large number of
 these and we absolutely do not have the resources to review them all. If you
 submit one that will be an automatic ban from the project.
 
-## Threat Model
+## Legal notice
 
-### Overview
+Boros is offensive-security software. It is intended for authorized
+penetration testing, red-team engagements, CTFs, and research on systems you
+own or have explicit written permission to test. Unauthorized use is illegal in
+most jurisdictions. The authors and contributors are not obligated to assist
+you and accept no liability for any consequence of your use.
 
-OpenCode is an AI-powered coding assistant that runs locally on your machine. It provides an agent system with access to powerful tools including shell execution, file operations, and web access.
+## Reporting a vulnerability in the tool itself
 
-### No Sandbox
+If you find a defect in Boros (a crash, an unsafe data-handling bug, a
+bypass of its own permission prompts, etc.), please report it through the
+GitHub Security Advisory tab:
 
-OpenCode does **not** sandbox the agent. The permission system exists as a UX feature to help users stay aware of what actions the agent is taking - it prompts for confirmation before executing commands, writing files, etc. However, it is not designed to provide security isolation.
+- [Report a vulnerability](https://github.com/uncesaii/boros/security/advisories/new)
 
-If you need true isolation, run OpenCode inside a Docker container or VM.
+After the initial reply, we will keep you informed of progress towards a fix
+and may ask for additional information.
 
-### Server Mode
+## Escalation
 
-Server mode is opt-in only. When enabled, set `OPENCODE_SERVER_PASSWORD` to require HTTP Basic Auth. Without this, the server runs unauthenticated (with a warning). It is the end user's responsibility to secure the server - any functionality it provides is not a vulnerability.
+If you do not receive an acknowledgement within 6 business days, you may open
+a public issue referencing the advisory.
 
-### Out of Scope
+## Threat model
+
+Boros runs a powerful agent locally with access to shell execution, file
+operations, and web access. Understand the trust boundaries before running it:
+
+### No sandbox
+
+Boros does **not** sandbox the agent. The permission system exists as a UX
+feature to keep you aware of what the agent is doing — it prompts before
+executing commands and writing files. It is **not** security isolation.
+
+If you need real isolation, run Boros inside a Docker container or VM.
+
+### Server mode
+
+Server mode is opt-in. When enabled, set `BOROS_SERVER_PASSWORD` (or the
+Boros equivalent) to require HTTP Basic Auth. Without it the server runs
+unauthenticated (with a warning). Securing the server is the operator's
+responsibility; any functionality it exposes is expected behavior, not a
+vulnerability.
+
+### Out of scope
 
 | Category                        | Rationale                                                               |
 | ------------------------------- | ----------------------------------------------------------------------- |
@@ -31,17 +60,4 @@ Server mode is opt-in only. When enabled, set `OPENCODE_SERVER_PASSWORD` to requ
 | **LLM provider data handling**  | Data sent to your configured LLM provider is governed by their policies |
 | **MCP server behavior**         | External MCP servers you configure are outside our trust boundary       |
 | **Malicious config files**      | Users control their own config; modifying it is not an attack vector    |
-
----
-
-# Reporting Security Issues
-
-We appreciate your efforts to responsibly disclose your findings, and will make every effort to acknowledge your contributions.
-
-To report a security issue, please use the GitHub Security Advisory ["Report a Vulnerability"](https://github.com/anomalyco/opencode/security/advisories/new) tab.
-
-The team will send a response indicating the next steps in handling your report. After the initial reply to your report, the security team will keep you informed of the progress towards a fix and full announcement, and may ask for additional information or guidance.
-
-## Escalation
-
-If you do not receive an acknowledgement of your report within 6 business days, you may send an email to security@anoma.ly
+| **Resulting compromise of targets** | A successful engagement is the tool working as designed; it is not a bug in Boros |

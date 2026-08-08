@@ -298,7 +298,7 @@ describe("HttpApi workspace routing middleware", () => {
       const body = '{"title":"Remote workspace request"}'
       const response = yield* HttpClientRequest.patch(`/probe?workspace=${workspace.id}&keep=yes`).pipe(
         HttpClientRequest.setHeaders({
-          "x-opencode-directory": "/secret/path",
+          "x-boros-directory": "/secret/path",
           "x-opencode-workspace": "internal",
         }),
         HttpClientRequest.bodyStream(
@@ -322,7 +322,7 @@ describe("HttpApi workspace routing middleware", () => {
       expect(forwarded?.body).toBe(body)
       expect(forwarded?.headers["content-type"]).toBe("application/json")
       expect(forwarded?.headers["x-target-auth"]).toBe("secret")
-      expect(forwarded?.headers["x-opencode-directory"]).toBeUndefined()
+      expect(forwarded?.headers["x-boros-directory"]).toBeUndefined()
       expect(forwarded?.headers["x-opencode-workspace"]).toBeUndefined()
     }),
   )
@@ -513,7 +513,7 @@ describe("HttpApi workspace routing middleware", () => {
       // directory hints before using the process cwd.
       const queryResponse = yield* HttpClient.get(`/probe?directory=${encodeURIComponent(queryDir)}`)
       const headerResponse = yield* HttpClientRequest.get("/probe").pipe(
-        HttpClientRequest.setHeader("x-opencode-directory", headerDir),
+        HttpClientRequest.setHeader("x-boros-directory", headerDir),
         HttpClient.execute,
       )
 

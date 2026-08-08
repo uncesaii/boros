@@ -16,15 +16,15 @@ import path from "path"
 // cache themselves and silence the eager refresh fork. Save/restore around
 // the suite — never leak the mutation to subsequent test files in the same
 // bun process.
-const ORIGINAL_MODELS_PATH = Flag.OPENCODE_MODELS_PATH
-const ORIGINAL_DISABLE_FETCH = Flag.OPENCODE_DISABLE_MODELS_FETCH
+const ORIGINAL_MODELS_PATH = Flag.BOROS_MODELS_PATH
+const ORIGINAL_DISABLE_FETCH = Flag.BOROS_DISABLE_MODELS_FETCH
 beforeAll(() => {
-  Flag.OPENCODE_MODELS_PATH = undefined
-  Flag.OPENCODE_DISABLE_MODELS_FETCH = true
+  Flag.BOROS_MODELS_PATH = undefined
+  Flag.BOROS_DISABLE_MODELS_FETCH = true
 })
 afterAll(() => {
-  Flag.OPENCODE_MODELS_PATH = ORIGINAL_MODELS_PATH
-  Flag.OPENCODE_DISABLE_MODELS_FETCH = ORIGINAL_DISABLE_FETCH
+  Flag.BOROS_MODELS_PATH = ORIGINAL_MODELS_PATH
+  Flag.BOROS_DISABLE_MODELS_FETCH = ORIGINAL_DISABLE_FETCH
 })
 
 const cacheFile = path.join(Global.Path.cache, "models.json")
@@ -161,12 +161,12 @@ describe("ModelsDev Service", () => {
       const context = yield* Layer.build(buildLayer(state))
       const result = yield* Effect.acquireUseRelease(
         Effect.sync(() => {
-          Flag.OPENCODE_DISABLE_MODELS_FETCH = false
+          Flag.BOROS_DISABLE_MODELS_FETCH = false
         }),
         () => ModelsDev.Service.use((s) => s.get()).pipe(Effect.provide(context)),
         () =>
           Effect.sync(() => {
-            Flag.OPENCODE_DISABLE_MODELS_FETCH = true
+            Flag.BOROS_DISABLE_MODELS_FETCH = true
           }),
       )
       expect(result).toEqual(fixture2)

@@ -6,7 +6,7 @@
  * requests, uses the right instance context, mutates storage when expected, and
  * returns the expected response shape.
  *
- * The script intentionally isolates `OPENCODE_DB` before importing modules that touch
+ * The script intentionally isolates `BOROS_DB` before importing modules that touch
  * storage. Scenarios may create/delete sessions and reset the database after each run,
  * so this must never point at a developer's real session database.
  *
@@ -117,8 +117,8 @@ const scenarios: Scenario[] = [
     ),
   http.protected.get("/path", "path.get").json(200, (body, ctx) => {
     object(body)
-    check(body.directory === ctx.directory, "directory should resolve from x-opencode-directory")
-    check(body.worktree === ctx.directory, "worktree should resolve from x-opencode-directory")
+    check(body.directory === ctx.directory, "directory should resolve from x-boros-directory")
+    check(body.worktree === ctx.directory, "worktree should resolve from x-boros-directory")
   }),
   http.protected.get("/vcs", "vcs.get").json(),
   http.protected.get("/vcs/status", "vcs.status").json(200, array),
@@ -789,7 +789,7 @@ const scenarios: Scenario[] = [
     .post("/api/pty/{ptyID}/connect-token", "v2.pty.connectToken")
     .at((ctx) => ({
       path: route("/api/pty/{ptyID}/connect-token", { ptyID: "pty_httpapi_missing" }),
-      headers: { ...ctx.headers(), "x-opencode-ticket": "1" },
+      headers: { ...ctx.headers(), "x-boros-ticket": "1" },
     }))
     .json(404, object, "status"),
   http.protected

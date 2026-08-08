@@ -75,8 +75,8 @@ delete process.env["DEEPSEEK_API_KEY"]
 delete process.env["FIREWORKS_API_KEY"]
 delete process.env["CEREBRAS_API_KEY"]
 delete process.env["SAMBANOVA_API_KEY"]
-delete process.env["OPENCODE_SERVER_PASSWORD"]
-delete process.env["OPENCODE_SERVER_USERNAME"]
+delete process.env["BOROS_SERVER_PASSWORD"]
+delete process.env["BOROS_SERVER_USERNAME"]
 delete process.env["OPENCODE_EXPERIMENTAL"]
 delete process.env["OPENCODE_ENABLE_EXPERIMENTAL_MODELS"]
 delete process.env["OTEL_EXPORTER_OTLP_ENDPOINT"]
@@ -84,7 +84,7 @@ delete process.env["OTEL_EXPORTER_OTLP_HEADERS"]
 delete process.env["OTEL_RESOURCE_ATTRIBUTES"]
 
 // Use in-memory sqlite
-process.env["OPENCODE_DB"] = ":memory:"
+process.env["BOROS_DB"] = ":memory:"
 
 // Now safe to import from src/
 const { initProjectors } = await import("../src/server/projectors")
