@@ -34,11 +34,12 @@ jobs:
         id: version
         run: |
           if [ -n "${{ inputs.version }}" ]; then
-            echo "tag=v${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+            TAG="v${{ inputs.version }}"
           else
-            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+            TAG="${GITHUB_REF#refs/tags/}"
           fi
-          echo "version=${GITHUB_OUTPUT_tag#v}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
         env:
           GITHUB_REF: ${{ github.ref }}
       - name: Create release

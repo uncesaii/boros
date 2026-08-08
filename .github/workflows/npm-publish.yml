@@ -44,7 +44,7 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npm config set //${NPM_REGISTRY#https://}:_authToken "$NPM_TOKEN"
+          npm config set //${NPM_REGISTRY#https://}/:_authToken "$NPM_TOKEN"
           npm whoami
       - name: Build native binaries (no GH release upload)
         env:
