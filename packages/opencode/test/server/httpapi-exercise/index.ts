@@ -789,7 +789,7 @@ const scenarios: Scenario[] = [
     .post("/api/pty/{ptyID}/connect-token", "v2.pty.connectToken")
     .at((ctx) => ({
       path: route("/api/pty/{ptyID}/connect-token", { ptyID: "pty_httpapi_missing" }),
-      headers: { ...ctx.headers(), "x-opencode-ticket": "1" },
+      headers: { ...ctx.headers(), "x-boros-ticket": "1" },
     }))
     .json(404, object, "status"),
   http.protected

@@ -117,7 +117,7 @@ describe("v2 pty HttpApi", () => {
 
       const token = await request(`/api/pty/${info.id}/connect-token`, tmp.path, {
         method: "POST",
-        headers: { "x-opencode-ticket": "1" },
+        headers: { "x-boros-ticket": "1" },
       })
       expect(token.status).toBe(200)
       const ticket = Schema.decodeUnknownSync(Location.response(PtyTicket.ConnectToken))(await token.json()).data.ticket

@@ -69,7 +69,7 @@ async function requestTicket(
     headers: {
       authorization: authorization(),
       "x-boros-directory": dir,
-      ...(options?.ticketHeader === false ? {} : { "x-opencode-ticket": "1" }),
+      ...(options?.ticketHeader === false ? {} : { "x-boros-ticket": "1" }),
       ...(options?.origin ? { origin: options.origin } : {}),
     },
   })
@@ -392,7 +392,7 @@ describe("HttpApi Server.listen", () => {
       // and cannot find a PTY registered in a project directory.
       const ambiguous = await fetch(new URL(PtyPaths.connectToken.replace(":ptyID", info.id), listener.url), {
         method: "POST",
-        headers: { authorization: authorization(), "x-opencode-ticket": "1" },
+        headers: { authorization: authorization(), "x-boros-ticket": "1" },
       })
       expect(ambiguous.status).toBe(404)
 
@@ -403,7 +403,7 @@ describe("HttpApi Server.listen", () => {
         ),
         {
           method: "POST",
-          headers: { authorization: authorization(), "x-opencode-ticket": "1" },
+          headers: { authorization: authorization(), "x-boros-ticket": "1" },
         },
       )
       expect(directoryScoped.status).toBe(200)

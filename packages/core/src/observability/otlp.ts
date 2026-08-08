@@ -40,7 +40,7 @@ export function resource(): { serviceName: string; serviceVersion: string; attri
     attributes: {
       ...resourceAttributes(),
       "deployment.environment.name": InstallationChannel,
-      "opencode.client": Flag.BOROS_CLIENT,
+      "boros.client": Flag.BOROS_CLIENT,
       "opencode.run": runID,
       "service.instance.id": runID,
     },
