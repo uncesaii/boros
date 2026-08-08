@@ -92,9 +92,9 @@ export function targetFiles(locale: Locale) {
 }
 
 export function glossaryFile(locale: Locale) {
-  if (locale === "zh") return ".opencode/glossary/zh-cn.md"
-  if (locale === "zht") return ".opencode/glossary/zh-tw.md"
-  return `.opencode/glossary/${locale}.md`
+  if (locale === "zh") return ".boros/glossary/zh-cn.md"
+  if (locale === "zht") return ".boros/glossary/zh-tw.md"
+  return `.boros/glossary/${locale}.md`
 }
 
 export function findDrift(source: Dictionary, target: Dictionary) {
