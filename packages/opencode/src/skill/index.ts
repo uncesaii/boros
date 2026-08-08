@@ -30,7 +30,7 @@ const SKILL_PATTERN = "**/SKILL.md"
 // when the model is asked to touch opencode's own config files gives it the
 // actual schemas instead of guesses.
 const CUSTOMIZE_BOROS_SKILL_NAME = "customize-boros"
-const CUSTOMIZE_OPENCODE_SKILL_DESCRIPTION =
+const CUSTOMIZE_BOROS_SKILL_DESCRIPTION =
   "Use ONLY when the user is editing or creating Boros' own configuration: boros.json, boros.jsonc, files under .boros/, or files under ~/.config/boros/. Also use when creating or fixing Boros agents, subagents, skills, plugins, MCP servers, or permission rules. Do not use for the user's own application code, or for any project that is not configuring Boros itself."
 const CUSTOMIZE_BOROS_SKILL_BODY = SkillPlugin.CustomizeBorosContent
 
@@ -277,9 +277,9 @@ const layer = Layer.effect(
         // skill with the same name can override it.
         s.skills[CUSTOMIZE_BOROS_SKILL_NAME] = {
           name: CUSTOMIZE_BOROS_SKILL_NAME,
-          description: CUSTOMIZE_OPENCODE_SKILL_DESCRIPTION,
+          description: CUSTOMIZE_BOROS_SKILL_DESCRIPTION,
           location: "<built-in>",
-          content: CUSTOMIZE_OPENCODE_SKILL_BODY,
+          content: CUSTOMIZE_BOROS_SKILL_BODY,
         }
         yield* loadSkills(s, yield* InstanceState.get(discovered), events)
         return s
