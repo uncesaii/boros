@@ -43,6 +43,7 @@ jobs:
           BOROS_EXPERIMENTAL_DISABLE_FILEWATCHER: false
       - name: HttpApi exerciser gates
         working-directory: packages/opencode
+        timeout-minutes: 5
         run: bun run test:httpapi
   build:
     needs: [typecheck, test]
