@@ -97,4 +97,4 @@ jobs:
             console.log('optionalDependencies:',JSON.stringify(deps));
           " "$VERSION"
           echo "publishing @boros-ai/boros @ $VERSION"
-          npm publish npm --access public --tag latest
+          npm publish ./npm --access public --tag latest
