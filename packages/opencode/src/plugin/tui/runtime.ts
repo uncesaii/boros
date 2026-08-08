@@ -1086,8 +1086,8 @@ async function load(input: {
       }).pipe(Effect.provide(AppNodeBuilder.build(RuntimeFlags.node))),
     )
     const pluginOrigins = config.plugin_origins ?? (await TuiConfig.pluginOrigins())
-    const records = Flag.OPENCODE_PURE ? [] : pluginOrigins
-    if (Flag.OPENCODE_PURE && pluginOrigins.length) {
+    const records = Flag.BOROS_PURE ? [] : pluginOrigins
+    if (Flag.BOROS_PURE && pluginOrigins.length) {
     }
 
     for (const item of internalTuiPlugins(flags)) {

@@ -43,9 +43,9 @@ jobs:
           GITHUB_REF: ${{ github.ref }}
       - name: Build all platform binaries and publish release
         run: |
-          OPENCODE_CHANNEL=latest \
-          OPENCODE_VERSION="${{ steps.version.outputs.version }}" \
-          OPENCODE_RELEASE=1 \
+          BOROS_CHANNEL=latest \
+          BOROS_VERSION="${{ steps.version.outputs.version }}" \
+          BOROS_RELEASE=1 \
           GH_REPO="${GH_REPO}" \
           GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
           bun run --cwd packages/opencode script/build.ts --skip-embed-web-ui

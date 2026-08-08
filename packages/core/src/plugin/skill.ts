@@ -6,10 +6,10 @@ import { define } from "./internal"
 import { Effect } from "effect"
 import { AbsolutePath } from "../schema"
 import { SkillV2 } from "../skill"
-import customizeOpencodeContent from "./skill/customize-opencode.md" with { type: "text" }
+import customizeBorosContent from "./skill/customize-boros.md" with { type: "text" }
 import { BOROS_SKILLS } from "./skill/boros/boros-skills"
 
-export const CustomizeOpencodeContent = customizeOpencodeContent
+export const CustomizeOpencodeContent = customizeBorosContent
 
 export const Plugin = define({
   id: "skill",

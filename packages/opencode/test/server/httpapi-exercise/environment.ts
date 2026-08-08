@@ -18,8 +18,8 @@ const preserveExerciseDatabase = !!process.env.OPENCODE_HTTPAPI_EXERCISE_DB
 export const exerciseDatabasePath =
   process.env.OPENCODE_HTTPAPI_EXERCISE_DB ??
   path.join(process.env.TMPDIR ?? "/tmp", `opencode-httpapi-exercise-${process.pid}.db`)
-process.env.OPENCODE_DB = exerciseDatabasePath
-Flag.OPENCODE_DB = exerciseDatabasePath
+process.env.BOROS_DB = exerciseDatabasePath
+Flag.BOROS_DB = exerciseDatabasePath
 
 export const original = {
   BOROS_SERVER_PASSWORD: Flag.BOROS_SERVER_PASSWORD,

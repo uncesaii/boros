@@ -4,13 +4,13 @@ import { type DialogContext } from "../ui/dialog"
 import {
   COMMAND_PALETTE_COMMAND,
   formatKeyBindings,
-  type OpenTuiKeymap,
+  type BorosTuiKeymap,
   useKeymapSelector,
-  useOpencodeKeymap,
+  useBorosKeymap,
 } from "../keymap"
 import { useTuiConfig } from "../config"
 
-type PaletteCommandEntry = ReturnType<OpenTuiKeymap["getCommandEntries"]>[number]
+type PaletteCommandEntry = ReturnType<BorosTuiKeymap["getCommandEntries"]>[number]
 
 function isVisiblePaletteCommand(command: PaletteCommandEntry["command"]) {
   return command.hidden !== true && command.name !== COMMAND_PALETTE_COMMAND
@@ -25,8 +25,8 @@ function isSuggestedPaletteCommand(entry: PaletteCommandEntry) {
 
 export function CommandPaletteDialog() {
   const config = useTuiConfig()
-  const keymap = useOpencodeKeymap()
-  const entries = useKeymapSelector((keymap: OpenTuiKeymap) => {
+  const keymap = useBorosKeymap()
+  const entries = useKeymapSelector((keymap: BorosTuiKeymap) => {
     const query = {
       namespace: "palette",
     }
