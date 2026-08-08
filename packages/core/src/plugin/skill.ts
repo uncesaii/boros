@@ -9,7 +9,7 @@ import { SkillV2 } from "../skill"
 import customizeBorosContent from "./skill/customize-boros.md" with { type: "text" }
 import { BOROS_SKILLS } from "./skill/boros/boros-skills"
 
-export const CustomizeOpencodeContent = customizeBorosContent
+export const CustomizeBorosContent = customizeBorosContent
 
 export const Plugin = define({
   id: "skill",

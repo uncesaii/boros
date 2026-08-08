@@ -32,7 +32,7 @@ const SKILL_PATTERN = "**/SKILL.md"
 const CUSTOMIZE_BOROS_SKILL_NAME = "customize-boros"
 const CUSTOMIZE_OPENCODE_SKILL_DESCRIPTION =
   "Use ONLY when the user is editing or creating Boros' own configuration: boros.json, boros.jsonc, files under .boros/, or files under ~/.config/boros/. Also use when creating or fixing Boros agents, subagents, skills, plugins, MCP servers, or permission rules. Do not use for the user's own application code, or for any project that is not configuring Boros itself."
-const CUSTOMIZE_OPENCODE_SKILL_BODY = SkillPlugin.CustomizeOpencodeContent
+const CUSTOMIZE_BOROS_SKILL_BODY = SkillPlugin.CustomizeBorosContent
 
 export const Info = Schema.Struct({
   name: Schema.String,

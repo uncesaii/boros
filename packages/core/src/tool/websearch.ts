@@ -72,11 +72,10 @@ export class ConfigService extends Context.Service<ConfigService, Config>()("@op
 /** Isolates the retained product environment contract from the generic tool implementation. */
 export const defaultConfigLayer = Layer.sync(ConfigService, () =>
   ConfigService.of({
-    provider:
-      (process.env.BOROS_WEBSEARCH_PROVIDER ?? process.env.OPENCODE_WEBSEARCH_PROVIDER) === "exa" ||
-      (process.env.BOROS_WEBSEARCH_PROVIDER ?? process.env.OPENCODE_WEBSEARCH_PROVIDER) === "parallel"
-        ? process.env.BOROS_WEBSEARCH_PROVIDER ?? process.env.OPENCODE_WEBSEARCH_PROVIDER
-        : undefined,
+    provider: (() => {
+      const provider = process.env.BOROS_WEBSEARCH_PROVIDER ?? process.env.OPENCODE_WEBSEARCH_PROVIDER
+      return provider === "exa" || provider === "parallel" ? provider : undefined
+    })(),
     enableExa: truthy("BOROS_EXPERIMENTAL") || truthy("BOROS_ENABLE_EXA") || truthy("OPENCODE_ENABLE_EXA") || truthy("OPENCODE_EXPERIMENTAL_EXA"),
     enableParallel: truthy("BOROS_ENABLE_PARALLEL") || truthy("OPENCODE_ENABLE_PARALLEL") || truthy("BOROS_EXPERIMENTAL_PARALLEL") || truthy("OPENCODE_EXPERIMENTAL_PARALLEL"),
     exaApiKey: process.env.EXA_API_KEY,
