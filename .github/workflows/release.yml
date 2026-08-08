@@ -41,6 +41,14 @@ jobs:
           echo "version=${GITHUB_OUTPUT_tag#v}" >> "$GITHUB_OUTPUT"
         env:
           GITHUB_REF: ${{ github.ref }}
+      - name: Create release
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          gh release view "$TAG" --repo "${GH_REPO}" >/dev/null 2>&1 && echo "release already exists" || \
+            gh release create "$TAG" --repo "${GH_REPO}" \
+              --title "Boros $TAG" --notes "Automated release from tag $TAG."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build all platform binaries and publish release
         run: |
           BOROS_CHANNEL=latest \
