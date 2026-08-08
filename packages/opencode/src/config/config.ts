@@ -450,9 +450,10 @@ const layer = Layer.effect(
           yield* mergePluginOrigins(dir, list)
         }
 
-        if (process.env.BOROS_CONFIG_CONTENT || process.env.OPENCODE_CONFIG_CONTENT) {
+        const configContent = process.env.BOROS_CONFIG_CONTENT ?? process.env.OPENCODE_CONFIG_CONTENT
+        if (configContent) {
           const source = "BOROS_CONFIG_CONTENT"
-          const next = yield* loadConfig(process.env.BOROS_CONFIG_CONTENT ?? process.env.OPENCODE_CONFIG_CONTENT, {
+          const next = yield* loadConfig(configContent, {
             dir: ctx.directory,
             source,
           })

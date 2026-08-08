@@ -5,7 +5,7 @@ import { testRender, useRenderer } from "@opentui/solid"
 import { createSignal } from "solid-js"
 import { createDefaultOpenTuiKeymap } from "@opentui/keymap/opentui"
 import type { QuestionRequest } from "@opencode-ai/sdk/v2"
-import { OpencodeKeymapProvider, registerOpencodeKeymap } from "@opencode-ai/tui/keymap"
+import { BorosKeymapProvider, registerBorosKeymap } from "@opencode-ai/tui/keymap"
 import {
   RUN_COMMAND_PANEL_ROWS,
   RUN_SUBAGENT_PANEL_ROWS,
@@ -179,10 +179,10 @@ async function renderFooter(
   function Harness() {
     const renderer = useRenderer()
     const keymap = createDefaultOpenTuiKeymap(renderer)
-    offKeymap = registerOpencodeKeymap(keymap, renderer, config)
+    offKeymap = registerBorosKeymap(keymap, renderer, config)
 
     return (
-      <OpencodeKeymapProvider keymap={keymap}>
+      <BorosKeymapProvider keymap={keymap}>
         <RunFooterView
           directory="/tmp"
           findFiles={async () => []}
@@ -216,7 +216,7 @@ async function renderFooter(
           onStatus={() => {}}
           onQueuedRemove={async () => true}
         />
-      </OpencodeKeymapProvider>
+      </BorosKeymapProvider>
     )
   }
 
@@ -962,10 +962,10 @@ test("direct footer shows editable prompts and additional queued work while runn
   function Harness() {
     const renderer = useRenderer()
     const keymap = createDefaultOpenTuiKeymap(renderer)
-    offKeymap = registerOpencodeKeymap(keymap, renderer, tuiConfig)
+    offKeymap = registerBorosKeymap(keymap, renderer, tuiConfig)
 
     return (
-      <OpencodeKeymapProvider keymap={keymap}>
+      <BorosKeymapProvider keymap={keymap}>
         <RunFooterView
           directory="/tmp"
           findFiles={async () => []}
@@ -1005,7 +1005,7 @@ test("direct footer shows editable prompts and additional queued work while runn
           onStatus={() => {}}
           onQueuedRemove={async () => true}
         />
-      </OpencodeKeymapProvider>
+      </BorosKeymapProvider>
     )
   }
 
@@ -1232,10 +1232,10 @@ test.skip("direct custom answer submits through keymap return binding", async ()
   function Harness() {
     const renderer = useRenderer()
     const keymap = createDefaultOpenTuiKeymap(renderer)
-    off = registerOpencodeKeymap(keymap, renderer, tuiConfig)
+    off = registerBorosKeymap(keymap, renderer, tuiConfig)
 
     return (
-      <OpencodeKeymapProvider keymap={keymap}>
+      <BorosKeymapProvider keymap={keymap}>
         <RunQuestionBody
           request={question}
           theme={RUN_THEME_FALLBACK.footer}
@@ -1244,7 +1244,7 @@ test.skip("direct custom answer submits through keymap return binding", async ()
           }}
           onReject={() => {}}
         />
-      </OpencodeKeymapProvider>
+      </BorosKeymapProvider>
     )
   }
 
@@ -1282,10 +1282,10 @@ test("direct permission rejection submits through keymap return binding", async 
   function Harness() {
     const renderer = useRenderer()
     const keymap = createDefaultOpenTuiKeymap(renderer)
-    off = registerOpencodeKeymap(keymap, renderer, tuiConfig)
+    off = registerBorosKeymap(keymap, renderer, tuiConfig)
 
     return (
-      <OpencodeKeymapProvider keymap={keymap}>
+      <BorosKeymapProvider keymap={keymap}>
         <RejectField
           theme={RUN_THEME_FALLBACK.footer}
           text=""
@@ -1298,7 +1298,7 @@ test("direct permission rejection submits through keymap return binding", async 
           }}
           onCancel={() => {}}
         />
-      </OpencodeKeymapProvider>
+      </BorosKeymapProvider>
     )
   }
 
