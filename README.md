@@ -81,6 +81,18 @@ installs the right native binary for your platform.
 npm install -g @boros-ai/boros
 ```
 
+### Option 2b — GitHub Packages
+
+The same packages are mirrored to GitHub Packages under the `@uncesaii`
+scope. Authenticate with a personal access token (classic) with `read:packages`
+scope (or use `gh auth token`):
+
+```bash
+npm config set //npm.pkg.github.com/:_authToken <TOKEN>
+npm config set @uncesaii:registry https://npm.pkg.github.com
+npm install -g @uncesaii/boros
+```
+
 ### Option 3 — GitHub Releases
 
 Grab the prebuilt archive for your platform from the
