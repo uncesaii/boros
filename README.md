@@ -47,6 +47,12 @@ comes back empty (redeployed with a different vector or a different agent).
   different vector or a different specialist.
 - **Auto-updating** — checks for updates and prompts inside the TUI/CLI.
 
+> [!NOTE]
+> Boros is built on the [OpenCode](https://github.com/anomalyco/opencode)
+> terminal AI shell as a stepping stone. We use its TUI, install/auto-update
+> pipeline, and CI/CD as the base and build the offensive-security agent swarm
+> on top of it — we do not fork or hide that dependency.
+
 ---
 
 ## Installation
@@ -79,18 +85,6 @@ installs the right native binary for your platform.
 
 ```bash
 npm install -g @boros-ai/boros
-```
-
-### Option 2b — GitHub Packages
-
-The same packages are mirrored to GitHub Packages under the `@uncesaii`
-scope. Authenticate with a personal access token (classic) with `read:packages`
-scope (or use `gh auth token`):
-
-```bash
-npm config set //npm.pkg.github.com/:_authToken <TOKEN>
-npm config set @uncesaii:registry https://npm.pkg.github.com
-npm install -g @uncesaii/boros
 ```
 
 ### Option 3 — GitHub Releases
