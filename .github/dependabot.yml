@@ -29,6 +29,12 @@ updates:
       # @ai-sdk/provider@^4 / provider-utils@^5, dragging in the v4 stack.
       - dependency-name: "@openrouter/ai-sdk-provider"
       - dependency-name: "ai-gateway-provider"
+      # Effect is pinned via the root catalog (effect 4.0.0-beta.83). Bumping
+      # @effect/platform-node etc. alone drifts the beta stack and breaks the
+      # build (beta.104 requires effect@^4.0.0-beta.104); bump catalog + packages
+      # together as a deliberate change.
+      - dependency-name: "@effect/*"
+      - dependency-name: "effect"
 
   - package-ecosystem: "github-actions"
     directory: "/"
