@@ -99,8 +99,12 @@ jobs:
             fs.writeFileSync('npm/package.json',JSON.stringify(pkg,null,2));
             console.log('optionalDependencies:',JSON.stringify(deps));
           " "$VERSION"
-          echo "publishing @boros-ai/boros @ $VERSION"
-          npm publish ./npm --access public --tag latest
+          if npm view "@boros-ai/boros@$VERSION" version >/dev/null 2>&1; then
+            echo "already published @boros-ai/boros@$VERSION, skipping"
+          else
+            echo "publishing @boros-ai/boros @ $VERSION"
+            npm publish ./npm --access public --tag latest
+          fi
       - name: Authenticate with GitHub Packages
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
