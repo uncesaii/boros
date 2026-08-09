@@ -18,12 +18,27 @@ updates:
     ignore:
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
-      # AI SDK v4 is a breaking migration across ~20 packages and the provider
-      # runtime. Excluded until it is migrated deliberately; see issue tracker.
+      # The AI SDK v3→v4 migration is deliberately excluded (see issue
+      # tracker). This ignores ALL @ai-sdk/* and ai updates, not just majors:
+      # already-v4 packages (amazon-bedrock, google-vertex) pull provider@4 /
+      # provider-utils@5 transitively and break the pinned v3 runtime.
       - dependency-name: "@ai-sdk/*"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "ai"
-        update-types: ["version-update:semver-major"]
+      # These two non-@ai-sdk/ providers are v4-aligned: @openrouter/ai-sdk-provider
+      # >=3.0.0 requires ai@^7 and ai-gateway-provider >=4.0.0 requires
+      # @ai-sdk/provider@^4 / provider-utils@^5, dragging in the v4 stack.
+      - dependency-name: "@openrouter/ai-sdk-provider"
+      - dependency-name: "ai-gateway-provider"
+      # Effect is pinned via the root catalog (effect 4.0.0-beta.83). Bumping
+      # @effect/platform-node etc. alone drifts the beta stack and breaks the
+      # build (beta.104 requires effect@^4.0.0-beta.104); bump catalog + packages
+      # together as a deliberate change.
+      - dependency-name: "@effect/*"
+      - dependency-name: "effect"
+      # @modelcontextprotocol/sdk 1.30.0 makes CallToolResult.content required,
+      # breaking types across src/mcp, src/tool/code-mode and acp tests; treat
+      # the SDK bump as a deliberate change.
+      - dependency-name: "@modelcontextprotocol/sdk"
 
   - package-ecosystem: "github-actions"
     directory: "/"
