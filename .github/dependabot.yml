@@ -24,6 +24,11 @@ updates:
       # provider-utils@5 transitively and break the pinned v3 runtime.
       - dependency-name: "@ai-sdk/*"
       - dependency-name: "ai"
+      # These two non-@ai-sdk/ providers are v4-aligned: @openrouter/ai-sdk-provider
+      # >=3.0.0 requires ai@^7 and ai-gateway-provider >=4.0.0 requires
+      # @ai-sdk/provider@^4 / provider-utils@^5, dragging in the v4 stack.
+      - dependency-name: "@openrouter/ai-sdk-provider"
+      - dependency-name: "ai-gateway-provider"
 
   - package-ecosystem: "github-actions"
     directory: "/"
