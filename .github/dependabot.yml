@@ -18,12 +18,12 @@ updates:
     ignore:
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
-      # AI SDK v4 is a breaking migration across ~20 packages and the provider
-      # runtime. Excluded until it is migrated deliberately; see issue tracker.
+      # The AI SDK v3→v4 migration is deliberately excluded (see issue
+      # tracker). This ignores ALL @ai-sdk/* and ai updates, not just majors:
+      # already-v4 packages (amazon-bedrock, google-vertex) pull provider@4 /
+      # provider-utils@5 transitively and break the pinned v3 runtime.
       - dependency-name: "@ai-sdk/*"
-        update-types: ["version-update:semver-major"]
       - dependency-name: "ai"
-        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

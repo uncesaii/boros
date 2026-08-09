@@ -112,30 +112,6 @@ jobs:
           npm config set //${GH_PACKAGES_REGISTRY#https://}/:_authToken "$GH_TOKEN"
           npm config set "${GH_PACKAGES_SCOPE}:registry" "$GH_PACKAGES_REGISTRY"
           npm whoami --registry "$GH_PACKAGES_REGISTRY"
-      - name: Publish platform binary packages to GitHub Packages
-        run: |
-          set -e
-          VERSION="${{ steps.version.outputs.version }}"
-          for pkgjson in packages/opencode/dist/*/package.json; do
-            [ -f "$pkgjson" ] || continue
-            dir=$(dirname "$pkgjson")
-            name=$(node -p "require('./$pkgjson').name")
-            case "$name" in boros-*) : ;; *) echo "skip $name"; continue ;; esac
-            scoped="${GH_PACKAGES_SCOPE}/$name"
-            node --input-type=commonjs -e "
-              const fs=require('fs');
-              const p=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));
-              p.name=process.argv[2];
-              p.publishConfig={ registry: process.argv[3], access: 'public' };
-              fs.writeFileSync(process.argv[1],JSON.stringify(p,null,2));
-            " "$pkgjson" "$scoped" "$GH_PACKAGES_REGISTRY"
-            if npm view "$scoped@$VERSION" version --registry "$GH_PACKAGES_REGISTRY" >/dev/null 2>&1; then
-              echo "already published $scoped@$VERSION, skipping"
-            else
-              echo "publishing platform package: $scoped @ $VERSION from $dir"
-              npm publish "$dir" --registry "$GH_PACKAGES_REGISTRY" --access public --tag latest
-            fi
-          done
       - name: Publish root @uncesaii/boros to GitHub Packages
         run: |
           set -e
@@ -145,17 +121,12 @@ jobs:
             const pkg=JSON.parse(fs.readFileSync('npm/package.json','utf8'));
             pkg.name=process.env.GH_PACKAGES_SCOPE + '/boros';
             pkg.version=process.argv[1];
-            const deps={};
-            for (const p of fs.readdirSync('packages/opencode/dist')){
-              const pj='packages/opencode/dist/'+p+'/package.json';
-              if(!fs.existsSync(pj)) continue;
-              const j=JSON.parse(fs.readFileSync(pj,'utf8'));
-              if(/^boros-/.test(j.name)) deps[j.name.replace(/^boros-/, process.env.GH_PACKAGES_SCOPE + '/boros-')]=pkg.version;
-            }
-            pkg.optionalDependencies=deps;
             pkg.publishConfig={ registry: process.env.GH_PACKAGES_REGISTRY, access: 'public' };
             fs.writeFileSync('npm/package.json',JSON.stringify(pkg,null,2));
-            console.log('optionalDependencies:',JSON.stringify(deps));
           " "$VERSION"
-          echo "publishing $GH_PACKAGES_SCOPE/boros @ $VERSION"
-          npm publish ./npm --registry "$GH_PACKAGES_REGISTRY" --access public --tag latest
+          if npm view "$GH_PACKAGES_SCOPE/boros@$VERSION" version --registry "$GH_PACKAGES_REGISTRY" >/dev/null 2>&1; then
+            echo "already published $GH_PACKAGES_SCOPE/boros@$VERSION, skipping"
+          else
+            echo "publishing $GH_PACKAGES_SCOPE/boros @ $VERSION"
+            npm publish ./npm --registry "$GH_PACKAGES_REGISTRY" --access public --tag latest
+          fi
