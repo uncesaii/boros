@@ -1,5 +1,9 @@
 # Boros
 
+These instructions apply to coding agents (Codex, the Boros agent, and others)
+working in this repository. Keep them durable, repo-scoped, and free of
+volatile business metrics.
+
 Boros is a production-grade, terminal-native offensive-security agent swarm. It
 is built on the OpenCode terminal AI shell (base: anomalyco/opencode), which
 provides the TUI, install/auto-update pipeline, and CI/CD, and adds a native
@@ -30,6 +34,62 @@ triage — autonomously, with every step human-reviewable in the terminal.
 - The default branch in this repo is `dev`.
 - Local `main` ref may not exist; use `dev` or `origin/dev` for diffs.
 
+## Worktree Dependencies
+
+Each checkout or worktree must have its own `node_modules` links. Never copy,
+move, or manually link an installed `node_modules` tree between the main
+checkout and another worktree. Sharing bun's global module cache is safe;
+sharing the installed dependency tree is not.
+
+After creating a worktree, install its dependencies with
+`bun install --frozen-lockfile`. If a checkout reports missing or stale links,
+repair it with `bun install --force --frozen-lockfile` before running
+development commands.
+
+## Product Direction
+
+Boros is primarily built for individual security practitioners: bug bounty
+hunters, solo pentesters, red-teamers, students, and technical builders who want
+practical AI-assisted offensive-security workflows. Teams and enterprise
+deployments exist, but they are a secondary surface; do not optimize product
+decisions, copy, onboarding, or UI around enterprise procurement, compliance
+checklists, or admin-heavy workflows unless the task explicitly asks for it.
+
+When working on product, onboarding, agent behavior, or UX, optimize first for
+fast solo-user activation: run-bare engagement flow, agent-mode clarity, local
+terminal setup, skill discoverability, cost clarity, and trust-through-
+transparency over enterprise sales language.
+
+Security and trust work should be candid about current capabilities: public
+source code, sandbox boundaries, subprocessors, data deletion, account
+security, and any missing formal certifications. Do not imply enterprise-grade
+compliance, managed security guarantees, or organizational trust claims unless
+they are already implemented and documented. Boros is an offensive-security
+tool; document impact honestly and never overstate its guarantees.
+
+For business, analytics, reliability, or production-regression questions, check
+the codebase docs and instrumentation first. Avoid hard-coding current revenue,
+user counts, pricing, or other volatile metrics in durable instructions; use
+qualitative direction and source-of-truth references instead.
+
+## Feature Rollouts and Measurement
+
+For meaningful user-facing features or behavior changes, consider a staged
+rollout so the release can be evaluated. Good candidates include new workflows,
+changed defaults, onboarding changes, costly Agent behavior, operationally
+risky behavior, and UX changes with uncertain impact. Do not require a flag for
+every change: routine refactors, minor polish, and correctness or security fixes
+that should reach everyone immediately are not flag candidates.
+
+Before implementing a staged rollout, record in the owning issue the
+hypothesis, eligible population, primary success metric, guardrail metrics,
+rollback condition, owner, and readout date. Start with an explicit allowlist,
+then ramp gradually. Assignment must be deterministic and stable.
+
+Shipping the implementation does not complete the rollout. Review the readout
+before expanding, removing the gate, or calling the rollout complete. Every
+rollout needs an owner and cleanup plan so stale gates do not accumulate.
+
 ## Branch Names
 
 Use a short branch name of at most three words, separated by hyphens. Do not use slashes or type prefixes such as `feat/` or `fix/`.
@@ -43,6 +103,109 @@ Use conventional commit-style messages and PR titles: `type(scope): summary`.
 Valid types are `feat`, `fix`, `docs`, `chore`, `refactor`, and `test`. Scopes are optional; use the affected package or area when helpful, e.g. `core`, `opencode`, `tui`, `app`, `desktop`, `sdk`, or `plugin`.
 
 Examples: `fix(tui): simplify thinking toggle styling`, `docs: update contributing guide`, `chore(sdk): regenerate types`.
+
+## Pull Request Review Workflow
+
+When a PR has been pushed and is ready for review, do not send the final
+completion message until CI and CodeRabbit are complete.
+
+Use this wait pattern:
+
+- Poll once within 30-60 seconds after PR creation to confirm checks started.
+- While CI checks are active, poll every 2-3 minutes.
+- When only CodeRabbit remains, poll every 3-5 minutes.
+- Treat 12-15 minutes as normal CodeRabbit runtime before calling it delayed.
+- If the user asks for status, report briefly, then continue waiting unless told
+  to stop.
+
+After CodeRabbit finishes:
+
+1. Check PR checks, CodeRabbit review status, review comments, review threads,
+   and issue comments.
+2. Treat every CodeRabbit suggestion as a hypothesis, not automatically correct.
+3. For each actionable comment:
+   - If valid, fix it with the smallest appropriate change, commit, push, and
+     wait for checks/CodeRabbit again.
+   - If false positive or not applicable, leave a brief PR reply explaining why
+     no change is needed.
+   - If it is a nit, fix it when low-risk and useful; otherwise explain why it
+     was skipped.
+4. Repeat until CodeRabbit is complete and there are no unresolved valid
+   actionable comments.
+
+Only finish when:
+
+- The PR is not draft.
+- The branch is pushed.
+- The local worktree is clean.
+- Required CI checks are passing.
+- CodeRabbit is complete.
+- Valid CodeRabbit comments are fixed or explicitly answered.
+- Visual verification is done when the PR has meaningful UI/user-visible impact.
+- Manual verification steps are included when the PR is user-facing, risky,
+  important, or needs human validation.
+- The only remaining blocker is human review, merge approval, or the listed
+  manual verification.
+
+## Thread Coordination
+
+Agents can use separate threads for independent work when that improves
+execution, review, or verification.
+
+Consider a separate thread when the work has a clear boundary, such as:
+
+- a distinct feature or bug that should become its own PR;
+- broad or high-risk visual QA worth an independent pass;
+- a long investigation that can run while implementation or PR checks continue;
+- a validation or follow-up task that does not need the current thread's full
+  context.
+
+Keep work in the current thread when it is one PR, a tightly coupled refactor, a
+small follow-up, overlapping file edits, or depends heavily on context from the
+current conversation.
+
+When creating or handing off a thread, include a compact brief with: objective,
+repo/worktree/branch, relevant files or PR, constraints, what not to change,
+required verification, expected deliverable, and how results should be reported
+back.
+
+For multi-PR work, split threads only when each PR can be reviewed and merged
+independently. Keep one parent thread responsible for coordinating scope,
+avoiding overlap, and integrating results.
+
+## Visual Verification
+
+Use visual verification in the same PR thread by default when the PR changes
+the terminal TUI, chat message rendering, file/image display, onboarding,
+frontend routes/components, or prompt behavior that creates a meaningful
+user-visible result.
+
+Do not require visual checks for backend-only, test-only, prompt-only, CI,
+logging, or non-visual agent orchestration changes unless there is a plausible
+user-facing impact.
+
+Create a separate visual QA thread only for broad or high-risk UI changes where
+independent review is worth the handoff cost, such as multi-screen flows, many
+responsive states, or a full visual polish pass. For the TUI, capture output
+with `tmux capture-pane` as described in `packages/opencode/AGENTS.md`.
+
+## Manual Verification Notes
+
+After checks and CodeRabbit are complete, include short manual verification
+steps when the PR is user-facing, risky, important, or cannot be fully validated
+by tests.
+
+Use this for changes involving auth/account security, agent or swarm behavior,
+local terminal connections, file operations, browser automation, important
+prompt behavior, install/update pipelines, or major UI flows.
+
+Manual steps should say:
+
+- Where to test.
+- What to do.
+- What should happen.
+
+If manual verification is not needed, say automated validation was sufficient.
 
 ## Style Guide
 
@@ -209,9 +372,8 @@ date-stamped branch so it is individually reviewable and traceable:
 
 - All changes go through a pull request into `main`.
 - `main` is protected: **at least one approving review** is required, CI
-  (`ci.yml`: typecheck + unit tests + build smoke) must be green, and the
-  agent (Boros) reviews each PR for correctness, security, and style before
-  approving. Do **not** merge your own PRs without a review.
+  (`ci.yml`: typecheck + unit tests + build smoke) must be green, and CodeRabbit
+  reviews each PR. Do **not** merge your own PRs without a review.
 - Use **squash-and-merge** so `main` history stays linear and each commit is
   one coherent unit. Include a concise summary of the change in the PR title.
 
