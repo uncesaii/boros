@@ -1,4 +1,7 @@
 <p align="center">
+  <img alt="Boros" src="assets/boros-logo.svg" width="160" />
+</p>
+<p align="center">
   <b>BOROS</b>
 </p>
 <p align="center"><i>A terminal-native offensive-security agent swarm.</i></p>
@@ -60,15 +63,13 @@ curl -fsSL https://raw.githubusercontent.com/uncesaii/boros/main/install | bash
 # Specific version
 curl -fsSL https://raw.githubusercontent.com/uncesaii/boros/main/install | bash -s -- --version 1.0.0
 
-# Custom install directory
-BOROS_INSTALL_DIR=/usr/local/bin curl -fsSL https://raw.githubusercontent.com/uncesaii/boros/main/install | bash
-
-# Install from a locally-built binary
+# Install from a locally-built binary (run from the directory containing install)
 ./install --binary /path/to/boros
 ```
 
-The installer places the binary in `$HOME/.boros/bin` and adds that directory
-to your shell rc.
+The installer always places the binary in `$HOME/.boros/bin` and, when it can,
+appends that directory to your shell config (`~/.zshrc`, `~/.bashrc`, or
+`~/.config/fish/config.fish`). Pass `--no-modify-path` to skip the PATH edit.
 
 ### Option 2 — npm
 
@@ -87,16 +88,25 @@ Grab the prebuilt archive for your platform from the
 
 | Platform | Binary |
 | --- | --- |
-| macOS (Apple Silicon / Intel) | `boros-darwin-arm64.zip` / `boros-darwin-x64.zip` |
-| Linux (glibc / musl) | `boros-linux-x64.tar.gz` / `boros-linux-arm64.tar.gz` |
-| Windows | `boros-windows-x64.zip` / `boros-windows-arm64.zip` |
+| macOS — Apple Silicon | `boros-darwin-arm64.zip` |
+| macOS — Intel (AVX2) | `boros-darwin-x64.zip` |
+| macOS — Intel (baseline) | `boros-darwin-x64-baseline.zip` |
+| Linux — x64 glibc | `boros-linux-x64.tar.gz` |
+| Linux — x64 glibc (baseline) | `boros-linux-x64-baseline.tar.gz` |
+| Linux — x64 musl | `boros-linux-x64-musl.tar.gz` |
+| Linux — x64 musl (baseline) | `boros-linux-x64-baseline-musl.tar.gz` |
+| Linux — arm64 glibc | `boros-linux-arm64.tar.gz` |
+| Linux — arm64 musl | `boros-linux-arm64-musl.tar.gz` |
+| Windows — x64 | `boros-windows-x64.zip` |
+| Windows — x64 (baseline) | `boros-windows-x64-baseline.zip` |
+| Windows — arm64 | `boros-windows-arm64.zip` |
 
 Extract and place the `boros` binary anywhere on your `PATH`.
 
 > [!TIP]
 > `boros` checks for updates automatically and prompts to update inside the
-> TUI/CLI. You can also run `boros upgrade` manually, or `boros version` to see
-> your version.
+> TUI/CLI. You can also run `boros upgrade` manually, or `boros --version` to
+> see your version.
 
 ---
 
@@ -104,13 +114,13 @@ Extract and place the `boros` binary anywhere on your `PATH`.
 
 ```sh
 boros                          # launch the TUI with the offensive orchestrator
-boros "@recon scan example.com"   # invoke a specialist directly
-boros "@web"                      # switch to the web exploitation operator
+boros run "@recon scan example.com"   # run a specialist directly as a prompt
+boros -v                       # print the installed version
 ```
 
 The root agent auto-classifies your objective on the first turn and delegates
 through the task tool — no `/agent` ceremony required. Specialists can also be
-summoned directly by name from the chat.
+summoned by name from within the chat.
 
 ---
 
@@ -164,15 +174,16 @@ built-in, ship with the binary, and need no network lookups. They live in
 
 ## Configuration
 
-Boros follows the classic config layout: global config in
-`~/.boros/boros.json` (or `boros.jsonc`), and project config in
-`.boros/boros.json` — with legacy fallbacks to `.opencode/` paths. It
-discovers the first matching file in this order:
+Boros reads `boros.json` / `boros.jsonc` and deep-merges every file it finds —
+later entries override earlier ones. Config is resolved in this order:
 
-1. `boros.json`
-2. `boros.jsonc`
-3. `opencode.json` (legacy)
-4. `opencode.jsonc` (legacy)
+1. **Global** — `$XDG_CONFIG_HOME/boros/boros.json` (default
+   `~/.config/boros/`), overridable with the `BOROS_CONFIG_DIR` environment
+   variable.
+2. **Project files** — `boros.json` / `boros.jsonc` from the project root down
+   to the directory you opened.
+3. **Scoped** — `.boros/boros.json` / `.boros/boros.jsonc` across the same
+   range, for config that travels with the repo.
 
 ---
 
@@ -191,8 +202,10 @@ bun run --cwd packages/opencode script/build.ts --single
 ## Contributing
 
 All changes go through a pull request into `main`; `main` is protected (CI must
-be green) and every commit lives on a date-stamped branch. See
-[`AGENTS.md`](./AGENTS.md) for the workflow and style guide.
+be green) and every commit lives on a date-stamped branch. Any UI or core
+product feature requires a design review with the core team before
+implementation. See [`AGENTS.md`](./AGENTS.md) for the full workflow and style
+guide.
 
 ---
 
