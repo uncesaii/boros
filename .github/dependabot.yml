@@ -35,6 +35,10 @@ updates:
       # together as a deliberate change.
       - dependency-name: "@effect/*"
       - dependency-name: "effect"
+      # @modelcontextprotocol/sdk 1.30.0 makes CallToolResult.content required,
+      # breaking types across src/mcp, src/tool/code-mode and acp tests; treat
+      # the SDK bump as a deliberate change.
+      - dependency-name: "@modelcontextprotocol/sdk"
 
   - package-ecosystem: "github-actions"
     directory: "/"
