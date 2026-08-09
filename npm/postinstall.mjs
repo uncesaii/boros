@@ -93,7 +93,7 @@ function isMusl() {
   }
 }
 
-function unscopedPackageNames() {
+function packageNames() {
   const baseline = arch === "x64" && !supportsAvx2()
   const base = `boros-${platform}-${arch}`
 
@@ -115,14 +115,6 @@ function unscopedPackageNames() {
 
   if (arch === "x64") return baseline ? [`${base}-baseline`, base] : [base, `${base}-baseline`]
   return [base]
-}
-
-function packageNames() {
-  const names = unscopedPackageNames()
-  // GitHub Packages publishes scoped mirrors (@uncesaii/boros-*) for the same
-  // carriers; prefer the scope the package was installed from.
-  const scoped = names.filter((name) => packageJson.optionalDependencies?.[`@uncesaii/${name}`])
-  return [...scoped.map((name) => `@uncesaii/${name}`), ...names]
 }
 
 function resolveBinary(name) {
