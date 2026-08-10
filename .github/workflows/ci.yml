@@ -21,7 +21,7 @@ jobs:
   typecheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-bun
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -30,7 +30,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-bun
         with:
           install-flags: "--frozen-lockfile"
@@ -43,12 +43,13 @@ jobs:
           BOROS_EXPERIMENTAL_DISABLE_FILEWATCHER: false
       - name: HttpApi exerciser gates
         working-directory: packages/opencode
+        timeout-minutes: 5
         run: bun run test:httpapi
   build:
     needs: [typecheck, test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-bun
       - name: Install dependencies
         run: bun install --frozen-lockfile

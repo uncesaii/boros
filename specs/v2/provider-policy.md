@@ -187,7 +187,7 @@ Result:
 provider.use / openai -> deny
 ```
 
-The relative policy precedence of direct project files and `.opencode` files is intentionally deferred until `.opencode` configuration is reviewed.
+The relative policy precedence of direct project files and `.boros` files is intentionally deferred until `.boros` configuration is reviewed.
 
 ## Organization-Managed Policy
 

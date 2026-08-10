@@ -14,9 +14,12 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 env:
   NPM_REGISTRY: "https://registry.npmjs.org"
+  GH_PACKAGES_REGISTRY: "https://npm.pkg.github.com"
+  GH_PACKAGES_SCOPE: "@uncesaii"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,7 +29,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-bun
         with:
           install-flags: --frozen-lockfile
@@ -44,7 +47,7 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npm config set //${NPM_REGISTRY#https://}:_authToken "$NPM_TOKEN"
+          npm config set //${NPM_REGISTRY#https://}/:_authToken "$NPM_TOKEN"
           npm whoami
       - name: Build native binaries (no GH release upload)
         env:
@@ -57,7 +60,7 @@ jobs:
         run: |
           set -e
           VERSION="${{ steps.version.outputs.version }}"
-          for pkgjson in dist/*/package.json; do
+          for pkgjson in packages/opencode/dist/*/package.json; do
             [ -f "$pkgjson" ] || continue
             dir=$(dirname "$pkgjson")
             name=$(node -p "require('./$pkgjson').name")
@@ -70,11 +73,14 @@ jobs:
               p.files=['bin']; p.version=process.argv[2];
               fs.writeFileSync(process.argv[1],JSON.stringify(p,null,2));
             " "$pkgjson" "$VERSION"
-            if npm view "$name@$VERSION" version >/dev/null 2>&1; then
+            if out=$(npm view "$name@$VERSION" version 2>&1); then
               echo "already published $name@$VERSION, skipping"
-            else
+            elif printf '%s' "$out" | grep -qiE 'E404|404 Not Found'; then
               echo "publishing platform package: $name @ $VERSION from $dir"
               npm publish "$dir" --access public --tag latest
+            else
+              echo "error: unexpected npm view result for $name@$VERSION: $out" >&2
+              exit 1
             fi
           done
       - name: Publish root @boros-ai/boros
@@ -86,8 +92,8 @@ jobs:
             const pkg=JSON.parse(fs.readFileSync('npm/package.json','utf8'));
             pkg.version=process.argv[1];
             const deps={};
-            for (const p of fs.readdirSync('dist')){
-              const pj='dist/'+p+'/package.json';
+            for (const p of fs.readdirSync('packages/opencode/dist')){
+              const pj='packages/opencode/dist/'+p+'/package.json';
               if(!fs.existsSync(pj)) continue;
               const j=JSON.parse(fs.readFileSync(pj,'utf8'));
               if(/^boros-/.test(j.name)) deps[j.name]=pkg.version;
@@ -96,5 +102,40 @@ jobs:
             fs.writeFileSync('npm/package.json',JSON.stringify(pkg,null,2));
             console.log('optionalDependencies:',JSON.stringify(deps));
           " "$VERSION"
-          echo "publishing @boros-ai/boros @ $VERSION"
-          npm publish npm --access public --tag latest
+          if out=$(npm view "@boros-ai/boros@$VERSION" version 2>&1); then
+            echo "already published @boros-ai/boros@$VERSION, skipping"
+          elif printf '%s' "$out" | grep -qiE 'E404|404 Not Found'; then
+            echo "publishing @boros-ai/boros @ $VERSION"
+            npm publish ./npm --access public --tag latest
+          else
+            echo "error: unexpected npm view result for @boros-ai/boros@$VERSION: $out" >&2
+            exit 1
+          fi
+      - name: Authenticate with GitHub Packages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm config set //${GH_PACKAGES_REGISTRY#https://}/:_authToken "$GH_TOKEN"
+          npm config set "${GH_PACKAGES_SCOPE}:registry" "$GH_PACKAGES_REGISTRY"
+          npm whoami --registry "$GH_PACKAGES_REGISTRY"
+      - name: Publish root @uncesaii/boros to GitHub Packages
+        run: |
+          set -e
+          VERSION="${{ steps.version.outputs.version }}"
+          node --input-type=commonjs -e "
+            const fs=require('fs');
+            const pkg=JSON.parse(fs.readFileSync('npm/package.json','utf8'));
+            pkg.name=process.env.GH_PACKAGES_SCOPE + '/boros';
+            pkg.version=process.argv[1];
+            pkg.publishConfig={ registry: process.env.GH_PACKAGES_REGISTRY, access: 'public' };
+            fs.writeFileSync('npm/package.json',JSON.stringify(pkg,null,2));
+          " "$VERSION"
+          if out=$(npm view "$GH_PACKAGES_SCOPE/boros@$VERSION" version --registry "$GH_PACKAGES_REGISTRY" 2>&1); then
+            echo "already published $GH_PACKAGES_SCOPE/boros@$VERSION, skipping"
+          elif printf '%s' "$out" | grep -qiE 'E404|404 Not Found'; then
+            echo "publishing $GH_PACKAGES_SCOPE/boros @ $VERSION"
+            npm publish ./npm --registry "$GH_PACKAGES_REGISTRY" --access public --tag latest
+          else
+            echo "error: unexpected npm view result for $GH_PACKAGES_SCOPE/boros@$VERSION: $out" >&2
+            exit 1
+          fi

@@ -95,6 +95,7 @@ function isMusl() {
 
 function packageNames() {
   const baseline = arch === "x64" && !supportsAvx2()
+  const base = `boros-${platform}-${arch}`
 
   if (platform === "linux") {
     if (isMusl()) {

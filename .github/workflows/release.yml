@@ -26,7 +26,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-bun
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -34,13 +34,22 @@ jobs:
         id: version
         run: |
           if [ -n "${{ inputs.version }}" ]; then
-            echo "tag=v${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+            TAG="v${{ inputs.version }}"
           else
-            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+            TAG="${GITHUB_REF#refs/tags/}"
           fi
-          echo "version=${GITHUB_OUTPUT_tag#v}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
         env:
           GITHUB_REF: ${{ github.ref }}
+      - name: Create release
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          gh release view "$TAG" --repo "${GH_REPO}" >/dev/null 2>&1 && echo "release already exists" || \
+            gh release create "$TAG" --repo "${GH_REPO}" \
+              --title "Boros $TAG" --notes "Automated release from tag $TAG."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build all platform binaries and publish release
         run: |
           BOROS_CHANNEL=latest \
