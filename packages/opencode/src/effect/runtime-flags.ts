@@ -9,9 +9,12 @@ const bool = (name: string) =>
   )
 const positiveInteger = (name: string) =>
   Config.number(name).pipe(
-    Config.map((value) => (Number.isInteger(value) && value > 0 ? value : undefined)),
+    Config.map(sanitizePositiveInteger),
+    Config.orElse(() => Config.number(legacy(name)).pipe(Config.map(sanitizePositiveInteger))),
     Config.orElse(() => Config.succeed(undefined)),
   )
+const sanitizePositiveInteger = (value: number) =>
+  Number.isInteger(value) && value > 0 ? value : undefined
 const experimental = bool("BOROS_EXPERIMENTAL")
 const enabledByExperimental = (name: string) =>
   Config.all({
@@ -64,7 +67,10 @@ export class Service extends ConfigService.Service<Service>()("@opencode/Runtime
   bashDefaultTimeoutMs: positiveInteger("BOROS_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS"),
   experimentalNativeLlm: bool("BOROS_EXPERIMENTAL_NATIVE_LLM"),
   experimentalWebSockets: bool("BOROS_EXPERIMENTAL_WEBSOCKETS"),
-  client: Config.string("BOROS_CLIENT").pipe(Config.withDefault("cli")),
+  client: Config.string("BOROS_CLIENT").pipe(
+    Config.orElse(() => Config.string("OPENCODE_CLIENT")),
+    Config.withDefault("cli"),
+  ),
 }) {}
 
 export type Info = Context.Service.Shape<typeof Service>
