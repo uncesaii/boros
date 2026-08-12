@@ -46,7 +46,7 @@ import { ModelV2 } from "@opencode-ai/core/model"
 import { Provider } from "@/provider/provider"
 import type { Command } from "@/command"
 
-export const AuthMethodID = "opencode-login"
+export const AuthMethodID = "boros-login"
 
 export type Error = ACPError.Error
 type ServiceConnection = Pick<AgentSideConnection, "sessionUpdate"> &
@@ -94,17 +94,17 @@ export function make(input: {
   const initialize = Effect.fn("ACP.initialize")(function* (params: InitializeRequest) {
     const started = performance.now()
     const authMethod: AuthMethod = {
-      description: "Run `opencode auth login` in the terminal",
-      name: "Login with opencode",
+      description: "Run `boros auth login` in the terminal",
+      name: "Login with boros",
       id: AuthMethodID,
     }
 
     if (params.clientCapabilities?._meta?.["terminal-auth"] === true) {
       authMethod._meta = {
         "terminal-auth": {
-          command: "opencode",
+          command: "boros",
           args: ["auth", "login"],
-          label: "OpenCode Login",
+          label: "Boros Login",
         },
       }
     }
@@ -130,7 +130,7 @@ export function make(input: {
       },
       authMethods: [authMethod],
       agentInfo: {
-        name: "OpenCode",
+        name: "Boros",
         version: InstallationVersion,
       },
     }
@@ -874,7 +874,7 @@ const promptResponse = Effect.fn("ACP.promptResponse")(function* (
 
 function promptErrorMessage(error: AssistantError) {
   if ("message" in error.data && typeof error.data.message === "string") return error.data.message
-  return "OpenCode prompt failed"
+  return "Boros prompt failed"
 }
 
 function sendUsageUpdate(
@@ -1067,7 +1067,7 @@ function fromUnknownError(error: unknown, service?: string): Error {
   if (isAuthRequired(error)) {
     return new ACPError.AuthRequiredError({ providerId: findProviderID(error) })
   }
-  return new ACPError.ServiceFailureError({ safeMessage: "OpenCode service failure", service })
+  return new ACPError.ServiceFailureError({ safeMessage: "Boros service failure", service })
 }
 
 function isACPError(error: unknown): error is Error {

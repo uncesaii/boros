@@ -56,7 +56,7 @@ jobs:
       - name: Build native binary (linux x64 smoke)
         run: |
           BOROS_CHANNEL=latest BOROS_VERSION="1.0.0" \
-            bun run --cwd packages/opencode script/build.ts --single --skip-embed-web-ui
+            bun run --cwd packages/opencode script/build.ts --single
       - name: Smoke test binary
         run: |
           BIN=$(ls packages/opencode/dist/boros-*/bin/boros 2>/dev/null | head -1)

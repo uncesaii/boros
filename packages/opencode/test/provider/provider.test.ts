@@ -1280,9 +1280,9 @@ it.instance(
   Effect.gen(function* () {
     const providers = yield* list
     expect(providers[ProviderV2.ID.make("nvidia")].options.headers).toEqual({
-      "HTTP-Referer": "https://opencode.ai/",
-      "X-Title": "opencode",
-      "X-BILLING-INVOKE-ORIGIN": "OpenCode",
+      "HTTP-Referer": "https://github.com/uncesaii/boros",
+      "X-Title": "boros",
+      "X-BILLING-INVOKE-ORIGIN": "Boros",
     })
   }),
   { config: { provider: { nvidia: { options: { apiKey: "test-api-key" } } } } },
@@ -1293,9 +1293,9 @@ it.instance(
   Effect.gen(function* () {
     const providers = yield* list
     expect(providers[ProviderV2.ID.make("nvidia")].options.headers).toEqual({
-      "HTTP-Referer": "https://opencode.ai/",
-      "X-Title": "opencode",
-      "X-BILLING-INVOKE-ORIGIN": "OpenCode",
+      "HTTP-Referer": "https://github.com/uncesaii/boros",
+      "X-Title": "boros",
+      "X-BILLING-INVOKE-ORIGIN": "Boros",
     })
   }),
   { config: { provider: { nvidia: { options: { apiKey: "test-api-key", baseURL: "http://localhost:8000/v1" } } } } },
@@ -1902,12 +1902,12 @@ it.instance(
     expect(providers[ProviderV2.ID.make("cloudflare-ai-gateway")]).toBeDefined()
     expect(providers[ProviderV2.ID.make("cloudflare-ai-gateway")].options.metadata).toEqual({
       invoked_by: "test",
-      project: "opencode",
+      project: "boros",
     })
   }),
   {
     config: {
-      provider: { "cloudflare-ai-gateway": { options: { metadata: { invoked_by: "test", project: "opencode" } } } },
+      provider: { "cloudflare-ai-gateway": { options: { metadata: { invoked_by: "test", project: "boros" } } } },
     },
   },
 )
