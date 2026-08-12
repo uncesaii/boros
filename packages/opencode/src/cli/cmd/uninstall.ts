@@ -130,12 +130,6 @@ async function showRemovalSummary(targets: RemovalTargets, method: Installation.
   if (method !== "curl" && method !== "unknown") {
     const cmds: Record<string, string> = {
       npm: "npm uninstall -g @boros-ai/boros",
-      pnpm: "pnpm uninstall -g @boros-ai/boros",
-      bun: "bun remove -g @boros-ai/boros",
-      yarn: "yarn global remove @boros-ai/boros",
-      brew: "brew uninstall boros",
-      choco: "choco uninstall boros",
-      scoop: "scoop uninstall boros",
     }
     prompts.log.info(`  ✓ Package: ${cmds[method] || method}`)
   }
@@ -181,28 +175,15 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
   if (method !== "curl" && method !== "unknown") {
     const cmds: Record<string, string[]> = {
       npm: ["npm", "uninstall", "-g", "@boros-ai/boros"],
-      pnpm: ["pnpm", "uninstall", "-g", "@boros-ai/boros"],
-      bun: ["bun", "remove", "-g", "@boros-ai/boros"],
-      yarn: ["yarn", "global", "remove", "@boros-ai/boros"],
-      brew: ["brew", "uninstall", "boros"],
-      choco: ["choco", "uninstall", "boros"],
-      scoop: ["scoop", "uninstall", "boros"],
     }
 
     const cmd = cmds[method]
     if (cmd) {
       spinner.start(`Running ${cmd.join(" ")}...`)
-      const result = await Process.run(method === "choco" ? ["choco", "uninstall", "boros", "-y", "-r"] : cmd, {
-        nothrow: true,
-      })
+      const result = await Process.run(cmd, { nothrow: true })
       if (result.code !== 0) {
         spinner.stop(`Package manager uninstall failed: exit code ${result.code}`, 1)
-        const text = `${result.stdout.toString("utf8")}\n${result.stderr.toString("utf8")}`
-        if (method === "choco" && text.includes("not running from an elevated command shell")) {
-          prompts.log.warn(`You may need to run '${cmd.join(" ")}' from an elevated command shell`)
-        } else {
-          prompts.log.warn(`You may need to run manually: ${cmd.join(" ")}`)
-        }
+        prompts.log.warn(`You may need to run manually: ${cmd.join(" ")}`)
       } else {
         spinner.stop("Package removed")
       }
