@@ -224,7 +224,7 @@ async function mockServers(page: Page, permissionRequests: string[], permissionR
       return json(route, [])
     if (["/global/config", "/config", "/provider/auth", "/mcp"].includes(url.pathname)) return json(route, {})
     if (url.pathname === "/provider") return json(route, provider(remote ? "server-b" : "server-a"))
-    if (url.pathname === "/agent") return json(route, [{ name: "build", mode: "primary" }])
+    if (url.pathname === "/agent") return json(route, [{ name: "operator", mode: "primary" }])
     if (url.pathname === "/project" || url.pathname === "/project/current") {
       const project = {
         id: remote ? sessionB.projectID : "project-server-a",

@@ -14,11 +14,11 @@ const AGENT_PREFIXES = ["agent/", "agents/"]
 
 describe("configEntryNameFromPath", () => {
   test("strips an `agents/` prefix and returns the bare name", () => {
-    expect(configEntryNameFromPath("agents/build.md", AGENT_PREFIXES)).toBe("build")
+    expect(configEntryNameFromPath("agents/build.md", AGENT_PREFIXES)).toBe("operator")
   })
 
   test("strips an `agent/` (singular) prefix", () => {
-    expect(configEntryNameFromPath("agent/build.md", AGENT_PREFIXES)).toBe("build")
+    expect(configEntryNameFromPath("agent/build.md", AGENT_PREFIXES)).toBe("operator")
   })
 
   test("preserves nested subdirectories in the key", () => {
@@ -45,13 +45,13 @@ describe("configEntryNameFromPath", () => {
     const item = "/home/agent/.config/opencode/agents/build.md"
     const relative = posix.relative(dir, item)
     expect(relative).toBe("agents/build.md")
-    expect(configEntryNameFromPath(relative, AGENT_PREFIXES)).toBe("build")
+    expect(configEntryNameFromPath(relative, AGENT_PREFIXES)).toBe("operator")
   })
 
   test("regression #25713: parent /agents/ segment is irrelevant", () => {
     const dir = "/srv/agents/team/.config/opencode"
     const item = "/srv/agents/team/.config/opencode/agents/build.md"
     const relative = posix.relative(dir, item)
-    expect(configEntryNameFromPath(relative, AGENT_PREFIXES)).toBe("build")
+    expect(configEntryNameFromPath(relative, AGENT_PREFIXES)).toBe("operator")
   })
 })

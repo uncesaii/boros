@@ -11,7 +11,7 @@ describe("normalizeAgentList", () => {
   test("adapts current agents to the app agent shape", () => {
     const result = normalizeAgentList([
       {
-        id: "build",
+        id: "operator",
         name: "Build",
         mode: "primary",
         hidden: false,
@@ -25,7 +25,7 @@ describe("normalizeAgentList", () => {
 
     expect(result).toEqual([
       {
-        name: "build",
+        name: "operator",
         description: undefined,
         mode: "primary",
         hidden: false,

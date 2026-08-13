@@ -164,7 +164,7 @@ function sessionInfo(id: string) {
   return {
     id,
     projectID: "project-1",
-    agent: "build",
+    agent: "operator",
     model: { id: "model-1", providerID: "provider-1" },
     cost: 0,
     tokens: { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },

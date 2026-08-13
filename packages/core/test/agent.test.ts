@@ -17,7 +17,7 @@ describe("AgentV2", () => {
       const agent = yield* AgentV2.Service
 
       expect(yield* agent.all()).toEqual([])
-      expect(yield* agent.get(AgentV2.ID.make("build"))).toBeUndefined()
+      expect(yield* agent.get(AgentV2.ID.make("operator"))).toBeUndefined()
     }),
   )
 
@@ -73,7 +73,7 @@ describe("AgentV2", () => {
   it.effect("applies direct agent updates", () =>
     Effect.gen(function* () {
       const agent = yield* AgentV2.Service
-      const id = AgentV2.ID.make("build")
+      const id = AgentV2.ID.make("operator")
 
       yield* agent.transform((editor) =>
         editor.update(id, (info) => {
@@ -118,7 +118,7 @@ describe("AgentV2", () => {
       expect([...byId.keys()].sort()).toEqual(
         [
           "assistant",
-          "build",
+          "operator",
           "compaction",
           "crypto",
           "explore",
@@ -140,7 +140,7 @@ describe("AgentV2", () => {
       const hasExplicitBash = (id: string) =>
         byId.get(id)?.permissions.some((rule) => rule.action === "bash" && rule.effect === "allow") ?? false
 
-      for (const id of ["build", "compaction", "explore", "general", "plan", "summary", "title", "triage"]) {
+      for (const id of ["operator", "compaction", "explore", "general", "plan", "summary", "title", "triage"]) {
         expect(hasExplicitBash(id)).toBe(false)
       }
       for (const id of ["recon", "exploit", "exploit-engineer", "privesc", "web", "assistant", "crypto", "llm", "post", "harness"]) {
