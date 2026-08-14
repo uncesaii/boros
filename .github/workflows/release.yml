@@ -57,7 +57,7 @@ jobs:
           BOROS_RELEASE=1 \
           GH_REPO="${GH_REPO}" \
           GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
-          bun run --cwd packages/opencode script/build.ts --skip-embed-web-ui
+          bun run --cwd packages/opencode script/build.ts
       - name: Verify release assets exist
         run: |
           ls -la dist/ 2>/dev/null || true

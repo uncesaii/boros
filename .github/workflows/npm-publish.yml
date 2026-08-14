@@ -55,7 +55,7 @@ jobs:
           BOROS_CHANNEL: latest
         run: |
           # NOTE: deliberately NOT setting BOROS_RELEASE so build.ts skips gh release upload
-          bun run --cwd packages/opencode script/build.ts --skip-embed-web-ui
+          bun run --cwd packages/opencode script/build.ts
       - name: Publish platform binary packages
         run: |
           set -e

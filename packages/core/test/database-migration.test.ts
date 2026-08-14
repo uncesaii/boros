@@ -125,7 +125,7 @@ describe("DatabaseMigration", () => {
         yield* DatabaseMigration.applyOnly(db, [contextEpochAgentMigration])
 
         expect(yield* db.get(sql`SELECT agent FROM session_context_epoch WHERE session_id = 'ses_existing'`)).toEqual({
-          agent: "build",
+          agent: "operator",
         })
       }),
     )

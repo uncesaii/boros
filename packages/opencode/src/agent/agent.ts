@@ -45,6 +45,7 @@ import {
   BOROS_LLM,
   BOROS_POST,
   BOROS_HARNESS,
+  BOROS_PLAN,
 } from "@opencode-ai/core/plugin/agent/prompt/boros-doctrine"
 
 export const Info = Schema.Struct({
@@ -153,8 +154,8 @@ const layer = Layer.effect(
         const user = Permission.fromConfig(cfg.permission ?? {})
 
         const agents: Record<string, Info> = {
-          build: {
-            name: "build",
+          operator: {
+            name: "operator",
             description:
               "Boros root orchestrator — runs the offensive kill chain to a verified compromise by delegating to specialist operators.",
             options: {},
@@ -172,7 +173,9 @@ const layer = Layer.effect(
           },
           plan: {
             name: "plan",
-            description: "Plan mode. Disallows all edit tools.",
+            description:
+              "Planning operator — before any exploitation, maps the operation: recon targets, attack-surface leads, exploit path, privilege-escalation chain, and a step-by-step todo list to a verified compromise. Produces a written offensive plan, never executes the attack.",
+            prompt: BOROS_PLAN + "\n\n" + BOROS_DOCTRINE,
             options: {},
             permission: Permission.merge(
               defaults,
@@ -198,7 +201,7 @@ const layer = Layer.effect(
           },
           general: {
             name: "general",
-            description: `General-purpose agent for researching complex questions and executing multi-step tasks. Use this agent to execute multiple units of work in parallel.`,
+            description: `General-purpose offensive operator — researches attack vectors, technique write-ups, and CVE context, and executes multi-step offensive tasks (credential hunting, config/artifact analysis, leak hunting, enumeration support) in parallel. Use this agent to run independent units of offensive work concurrently.`,
             permission: Permission.merge(
               defaults,
               Permission.fromConfig({
@@ -227,7 +230,7 @@ const layer = Layer.effect(
               }),
               user,
             ),
-            description: `Fast agent specialized for exploring codebases. Use this when you need to quickly find files by patterns (eg. "src/components/**/*.tsx"), search code for keywords (eg. "API endpoints"), or answer questions about the codebase (eg. "how do API endpoints work?"). When calling this agent, specify the desired thoroughness level: "quick" for basic searches, "medium" for moderate exploration, or "very thorough" for comprehensive analysis across multiple locations and naming conventions.`,
+            description: `Fast reconnaissance operator specialized for digging through a target's exposed surface: dumped source, configs, logs, env files, backups, and seized artifacts. Use when you need to quickly find files by patterns (eg. "**/*.env", "**/config*.json"), grep for high-value tokens (API keys, passwords, JWTs, AWS keys, connection strings, leaked secrets), inventory the stack (package manifests, lockfiles, dependency versions), or answer questions about how a target's systems are wired (eg. "where are the admin creds stored?"). When calling this agent, specify the desired thoroughness level: "quick" for basic searches, "medium" for moderate scanning, or "very thorough" for comprehensive digging across multiple locations and naming conventions.`,
             prompt: PROMPT_EXPLORE,
             options: {},
             mode: "subagent",
@@ -581,11 +584,13 @@ const layer = Layer.effect(
 
         const list = Effect.fnUntraced(function* () {
           const cfg = yield* config.get()
+          // "build" is the pre-fork name of the default agent; sort aliases the same.
+          const defaultName = cfg.default_agent === "build" ? "operator" : cfg.default_agent
           return pipe(
             agents,
             values(),
             sortBy(
-              [(x) => (cfg.default_agent ? x.name === cfg.default_agent : x.name === "build"), "desc"],
+              [(x) => (defaultName ? x.name === defaultName : x.name === "operator"), "desc"],
               [(x) => x.name, "asc"],
             ),
           )
@@ -594,7 +599,10 @@ const layer = Layer.effect(
         const defaultInfo = Effect.fnUntraced(function* () {
           const c = yield* config.get()
           if (c.default_agent) {
-            const agent = agents[c.default_agent]
+            // Compatibility: the default agent was renamed "build" -> "operator";
+            // existing configs may still set the legacy name.
+            const name = c.default_agent === "build" ? "operator" : c.default_agent
+            const agent = agents[name]
             if (!agent) throw new Error(`default agent "${c.default_agent}" not found`)
             if (agent.mode === "subagent") throw new Error(`default agent "${c.default_agent}" is a subagent`)
             if (agent.hidden === true) throw new Error(`default agent "${c.default_agent}" is hidden`)

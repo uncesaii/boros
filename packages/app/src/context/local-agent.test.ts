@@ -1,0 +1,29 @@
+import { describe, expect, test } from "bun:test"
+import { hasCustomAgent, resolveAgent } from "./local-agent"
+
+describe("hasCustomAgent", () => {
+  test("detects explicitly custom agents", () => {
+    expect(hasCustomAgent([{ native: true }, { native: false }])).toBe(true)
+  })
+
+  test("ignores built-in and unclassified agents", () => {
+    expect(hasCustomAgent([{ native: true }, {}])).toBe(false)
+  })
+})
+
+describe("resolveAgent", () => {
+  const agents = [{ name: "plan" }, { name: "operator" }, { name: "custom" }]
+
+  test("uses the requested available agent", () => {
+    expect(resolveAgent(agents, "custom")?.name).toBe("custom")
+  })
+
+  test("defaults to operator", () => {
+    expect(resolveAgent(agents)?.name).toBe("operator")
+    expect(resolveAgent(agents, "missing")?.name).toBe("operator")
+  })
+
+  test("uses the first agent when operator is unavailable", () => {
+    expect(resolveAgent([{ name: "custom" }], "missing")?.name).toBe("custom")
+  })
+})

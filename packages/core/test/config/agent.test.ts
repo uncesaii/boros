@@ -48,7 +48,7 @@ describe("ConfigAgentPlugin.Plugin", () => {
   it.effect("applies all global permissions before agent-specific permissions", () =>
     Effect.gen(function* () {
       const agents = yield* AgentV2.Service
-      const build = AgentV2.ID.make("build")
+      const build = AgentV2.ID.make("operator")
       yield* agents.transform((editor) =>
         editor.update(build, (agent) => {
           agent.mode = "primary"
@@ -64,7 +64,7 @@ describe("ConfigAgentPlugin.Plugin", () => {
               info: decode({
                 permissions: [{ action: "bash", resource: "*", effect: "ask" }],
                 agents: {
-                  build: {
+                  operator: {
                     permissions: [{ action: "bash", resource: "git *", effect: "allow" }],
                   },
                   reviewer: {
@@ -202,7 +202,7 @@ describe("ConfigAgentPlugin.Plugin", () => {
   it.effect("removes a built-in agent disabled by configuration", () =>
     Effect.gen(function* () {
       const agents = yield* AgentV2.Service
-      const build = AgentV2.ID.make("build")
+      const build = AgentV2.ID.make("operator")
       yield* agents.transform((editor) => editor.update(build, () => {}))
 
       const config = Config.Service.of({
@@ -210,7 +210,7 @@ describe("ConfigAgentPlugin.Plugin", () => {
           Effect.succeed([
             new Config.Document({
               type: "document",
-              info: decode({ agents: { build: { disabled: true } } }),
+              info: decode({ agents: { operator: { disabled: true } } }),
             }),
           ]),
       })
@@ -303,7 +303,7 @@ Use native v2 fields.`,
 function loadHomePermissions(home: string) {
   return Effect.gen(function* () {
     const agents = yield* AgentV2.Service
-    const build = AgentV2.ID.make("build")
+    const build = AgentV2.ID.make("operator")
     yield* agents.transform((editor) => editor.update(build, () => {}))
     const config = Config.Service.of({
       entries: () =>
@@ -323,7 +323,7 @@ function loadHomePermissions(home: string) {
                   },
                 },
                 agent: {
-                  build: {
+                  operator: {
                     permission: {
                       external_directory: {
                         "$HOME/cache/**": "deny",
