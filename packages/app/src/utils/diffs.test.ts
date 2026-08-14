@@ -43,7 +43,7 @@ describe("message", () => {
       sessionID: "ses_1",
       role: "user",
       time: { created: 1 },
-      agent: "build",
+      agent: "operator",
       model: { providerID: "openai", modelID: "gpt-5" },
       summary: {
         title: "Edit",
@@ -65,7 +65,7 @@ describe("message", () => {
       sessionID: "ses_1",
       role: "user",
       time: { created: 1 },
-      agent: "build",
+      agent: "operator",
       model: { providerID: "openai", modelID: "gpt-5" },
       summary: true,
     } as unknown as Message

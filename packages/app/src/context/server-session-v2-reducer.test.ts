@@ -38,7 +38,7 @@ describe("v2 session reducer", () => {
       data: {
         sessionID: "ses_1",
         assistantMessageID: "msg_assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
       },
     })
@@ -84,7 +84,7 @@ describe("v2 session reducer", () => {
       data: {
         sessionID: "ses_1",
         assistantMessageID: "msg_assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
       },
     })

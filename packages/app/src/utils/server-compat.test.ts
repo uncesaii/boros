@@ -72,7 +72,7 @@ describe("createCompatibleApi", () => {
       sessionID: "ses_1",
       id: "msg_1",
       text: "hello @src/index.ts",
-      agent: "build",
+      agent: "operator",
       model: { providerID: "provider", modelID: "model" },
       files: [
         { uri: "file:///repo/src/index.ts", name: "index.ts", mention: { text: "@src/index.ts", start: 6, end: 19 } },
@@ -84,7 +84,7 @@ describe("createCompatibleApi", () => {
     const body = await requests[0]!.json()
     expect(body).toMatchObject({
       messageID: "msg_1",
-      agent: "build",
+      agent: "operator",
       model: { providerID: "provider", modelID: "model" },
       parts: [
         { type: "text", text: "hello @src/index.ts" },

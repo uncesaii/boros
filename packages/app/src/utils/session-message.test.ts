@@ -5,7 +5,7 @@ import { normalizeSessionMessages } from "./session-message"
 describe("normalizeSessionMessages", () => {
   test("projects current turns into stable legacy rendering records", () => {
     const source = [
-      { id: "msg_1", type: "agent-switched", agent: "build", time: { created: 1 } },
+      { id: "msg_1", type: "agent-switched", agent: "operator", time: { created: 1 } },
       {
         id: "msg_2",
         type: "model-switched",
@@ -37,7 +37,7 @@ describe("normalizeSessionMessages", () => {
       {
         id: "msg_4",
         type: "assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "claude", providerID: "anthropic", variant: "high" },
         content: [
           { type: "reasoning", text: "Thinking", time: { created: 4, completed: 5 } },
@@ -76,7 +76,7 @@ describe("normalizeSessionMessages", () => {
     expect(result.messages[0]).toMatchObject({
       id: "msg_3",
       role: "user",
-      agent: "build",
+      agent: "operator",
       model: { providerID: "anthropic", modelID: "claude", variant: "high" },
     })
     expect(result.messages[1]).toMatchObject({ id: "msg_4", role: "assistant", parentID: "msg_3", cost: 0.1 })
@@ -108,7 +108,7 @@ describe("normalizeSessionMessages", () => {
       {
         id: "msg_2",
         type: "assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
         content: [{ type: "text", text: "orphan" }],
         time: { created: 2 },
@@ -159,7 +159,7 @@ describe("normalizeSessionMessages", () => {
       {
         id: "msg_assistant",
         type: "assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
         content: [
           {

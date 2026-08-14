@@ -8,7 +8,7 @@ const message = (input?: { agent?: string; model?: UserMessage["model"] }) =>
     sessionID: "session",
     role: "user",
     time: { created: 1 },
-    agent: input?.agent ?? "build",
+    agent: input?.agent ?? "operator",
     model: input?.model ?? { providerID: "anthropic", modelID: "claude-sonnet-4" },
   }) as UserMessage
 

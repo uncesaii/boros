@@ -108,7 +108,7 @@ async function mockServer(page: Page) {
     if (["/global/config", "/config", "/provider/auth", "/mcp"].includes(url.pathname)) return json(route, {})
     if (url.pathname === "/provider")
       return json(route, { all: [], connected: [], default: { providerID: "", modelID: "" } })
-    if (url.pathname === "/agent") return json(route, [{ name: "build", mode: "primary" }])
+    if (url.pathname === "/agent") return json(route, [{ name: "operator", mode: "primary" }])
     if (url.pathname === "/project" || url.pathname === "/project/current") {
       const project = {
         id: sessionA.projectID,

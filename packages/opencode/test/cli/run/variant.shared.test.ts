@@ -92,7 +92,7 @@ function userMessage(
       time: {
         created: 1,
       },
-      agent: "build",
+      agent: "operator",
       model: input,
     },
     parts: [],

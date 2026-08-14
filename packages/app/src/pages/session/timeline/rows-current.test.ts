@@ -21,7 +21,7 @@ describe("current session timeline rows", () => {
       {
         id: "msg_2",
         type: "assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
         content: [{ type: "text", text: "answer" }],
         time: { created: 2, completed: 3 },
@@ -30,7 +30,7 @@ describe("current session timeline rows", () => {
       {
         id: "msg_4",
         type: "assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
         content: [{ type: "reasoning", text: "working" }],
         time: { created: 5 },
@@ -98,7 +98,7 @@ describe("current session timeline rows", () => {
       {
         id: "msg_assistant_1",
         type: "assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
         content: [{ type: "text", text: "first answer" }],
         time: { created: 2, completed: 3 },
@@ -107,7 +107,7 @@ describe("current session timeline rows", () => {
       {
         id: "msg_assistant_2",
         type: "assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
         content: [{ type: "text", text: "second answer" }],
         time: { created: 5, completed: 6 },
@@ -145,7 +145,7 @@ describe("current session timeline rows", () => {
       sessionID: "ses_1",
       role: "user" as const,
       time: { created: 2 },
-      agent: "build",
+      agent: "operator",
       model: { modelID: "model", providerID: "provider" },
     }
     const result = Timeline.constructSessionMessageRows(
@@ -174,7 +174,7 @@ describe("current session timeline rows", () => {
       {
         id: "msg_failed",
         type: "assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
         content: [],
         error: { type: "ProviderError", message: "temporary failure" },
@@ -183,7 +183,7 @@ describe("current session timeline rows", () => {
       {
         id: "msg_recovery",
         type: "assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
         content: [{ type: "text", text: "streaming again" }],
         time: { created: 4 },
