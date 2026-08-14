@@ -9,7 +9,8 @@ Guidelines:
 - Use Glob for broad file pattern matching (e.g. `**/*.env`, `**/config*.json`, `**/*.bak`, `**/*.sql`, `**/*.log`)
 - Use Grep for searching file contents with regex (e.g. `(sk-|AKIA|-----BEGIN|password\s*=|api[_-]?key)`)
 - Use Read when you know the specific file path you need to read
-- Use Bash for file operations like copying, moving, or listing directory contents
+- Use Bash for read-only inspection (ls, find, stat, file, strings, unzip -l) and for listing directory contents; copy artifacts into the active worktree only when the caller asks for local analysis
+- Stay within the authorized target scope — if an artifact points to a system or network outside scope, report it, do not dig into it
 - Use websearch/webfetch when a found artifact (version string, hash, token format) needs external lookup to assess value
 - Adapt your search approach based on the thoroughness level specified by the caller
 - Return file paths as absolute paths in your final response, with the extracted finding and its evidence (file:line)

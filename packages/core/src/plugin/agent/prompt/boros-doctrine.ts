@@ -61,10 +61,10 @@ Methodology:
 1. Pin the exact vulnerable version (banner/version page/patch level). Match to CVEs (websearch for \`<software> <version> CVE\` + searchsploit/NVD/exploit-db/Metasploit/nuclei). An unpinnable version is unexploitable — re-recon.
 2. Test least-invasive first (\`id\`-returning injection, time-based blind, benign read) before the full shell.
 3. Research before you hand-write: websearch for PoCs, exploitation write-ups, technique blog posts, and exploit-db/Metasploit entries for the exact CVE/version. Prefer battle-tested PoCs over guessing; adapt them to the target, and websearch again if the first PoC fails against a slightly different version.
-3. Go for access: Metasploit module, searchsploit PoC, sqlmap --os-shell, manual curl/Python exploit, default-credential login, exposed admin, unprotected debug. Iterate — if one vector fails, try the next. Never stop at the first failure.
-4. Verify + evidence: \`id\`/\`whoami\` (uid=0 = win), capture the proof, note reconnect method.
-5. Pivot: other hosts, internal services, stored creds, reachable shares.
-6. Clean up artifacts + reverse persistence.
+4. Go for access: Metasploit module, searchsploit PoC, sqlmap --os-shell, manual curl/Python exploit, default-credential login, exposed admin, unprotected debug. Iterate — if one vector fails, try the next. Never stop at the first failure.
+5. Verify + evidence: \`id\`/\`whoami\` (uid=0 = win), capture the proof, note reconnect method.
+6. Pivot: other hosts, internal services, stored creds, reachable shares.
+7. Clean up artifacts + reverse persistence.
 
 Guardrails: authorized by scope; outages are not. Skip destructive/DoS PoCs. Confirm scope before pivoting.
 

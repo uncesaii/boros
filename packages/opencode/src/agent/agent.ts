@@ -201,7 +201,7 @@ const layer = Layer.effect(
           },
           general: {
             name: "general",
-            description: `General-purpose offensive operator — researches attack vectors, technique write-ups, and CVE context, and executes multi-step offensive tasks (credential hunting, config/artifact analysis, leakturning, enumeration support) in parallel. Use this agent to run independent units of offensive work concurrently.`,
+            description: `General-purpose offensive operator — researches attack vectors, technique write-ups, and CVE context, and executes multi-step offensive tasks (credential hunting, config/artifact analysis, leak hunting, enumeration support) in parallel. Use this agent to run independent units of offensive work concurrently.`,
             permission: Permission.merge(
               defaults,
               Permission.fromConfig({
@@ -584,11 +584,13 @@ const layer = Layer.effect(
 
         const list = Effect.fnUntraced(function* () {
           const cfg = yield* config.get()
+          // "build" is the pre-fork name of the default agent; sort aliases the same.
+          const defaultName = cfg.default_agent === "build" ? "operator" : cfg.default_agent
           return pipe(
             agents,
             values(),
             sortBy(
-              [(x) => (cfg.default_agent ? x.name === cfg.default_agent : x.name === "operator"), "desc"],
+              [(x) => (defaultName ? x.name === defaultName : x.name === "operator"), "desc"],
               [(x) => x.name, "asc"],
             ),
           )
@@ -597,7 +599,10 @@ const layer = Layer.effect(
         const defaultInfo = Effect.fnUntraced(function* () {
           const c = yield* config.get()
           if (c.default_agent) {
-            const agent = agents[c.default_agent]
+            // Compatibility: the default agent was renamed "build" -> "operator";
+            // existing configs may still set the legacy name.
+            const name = c.default_agent === "build" ? "operator" : c.default_agent
+            const agent = agents[name]
             if (!agent) throw new Error(`default agent "${c.default_agent}" not found`)
             if (agent.mode === "subagent") throw new Error(`default agent "${c.default_agent}" is a subagent`)
             if (agent.hidden === true) throw new Error(`default agent "${c.default_agent}" is hidden`)

@@ -753,3 +753,19 @@ it.instance(
     },
   },
 )
+
+it.instance(
+  "defaultAgent accepts the legacy 'build' name as an alias for operator",
+  () =>
+    Effect.gen(function* () {
+      const agent = yield* load((svc) => svc.defaultAgent())
+      expect(agent).toBe("operator")
+      const info = yield* load((svc) => svc.defaultInfo())
+      expect(info.name).toBe("operator")
+    }),
+  {
+    config: {
+      default_agent: "build",
+    },
+  },
+)

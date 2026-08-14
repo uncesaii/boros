@@ -18,12 +18,12 @@ describe("resolveAgent", () => {
     expect(resolveAgent(agents, "custom")?.name).toBe("custom")
   })
 
-  test("defaults to build", () => {
+  test("defaults to operator", () => {
     expect(resolveAgent(agents)?.name).toBe("operator")
     expect(resolveAgent(agents, "missing")?.name).toBe("operator")
   })
 
-  test("uses the first agent when build is unavailable", () => {
+  test("uses the first agent when operator is unavailable", () => {
     expect(resolveAgent([{ name: "custom" }], "missing")?.name).toBe("custom")
   })
 })
