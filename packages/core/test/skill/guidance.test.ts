@@ -9,7 +9,7 @@ import { SystemContext } from "@opencode-ai/core/system-context"
 import { SkillGuidance } from "@opencode-ai/core/skill/guidance"
 import { it } from "../lib/effect"
 
-const build = AgentV2.ID.make("build")
+const build = AgentV2.ID.make("operator")
 const effect = SkillV2.Info.make({
   name: "effect",
   description: "Build applications with Effect",

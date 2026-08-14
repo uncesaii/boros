@@ -32,7 +32,7 @@ const userMessage = (id: string, input: Partial<UserMessage> = {}): UserMessage 
   sessionID: "child",
   role: "user",
   time: { created: 1 },
-  agent: "build",
+  agent: "operator",
   model: { providerID: "provider", modelID: "model" },
   ...input,
 })
@@ -45,8 +45,8 @@ const assistantMessage = (id: string, parentID: string, input: Partial<Assistant
   parentID,
   modelID: "model",
   providerID: "provider",
-  mode: "build",
-  agent: "build",
+  mode: "operator",
+  agent: "operator",
   path: { cwd: "/repo", root: "/repo" },
   cost: 0,
   tokens: { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
@@ -184,7 +184,7 @@ describe("server session", () => {
       data: {
         sessionID: "child",
         assistantMessageID: "msg_2_assistant",
-        agent: "build",
+        agent: "operator",
         model: { id: "model", providerID: "provider" },
       },
     })
@@ -239,7 +239,7 @@ describe("server session", () => {
     const assistant = {
       id: "msg_a_assistant",
       type: "assistant",
-      agent: "build",
+      agent: "operator",
       model: { id: "model", providerID: "provider" },
       content: [{ type: "text", text: "hi" }],
       time: { created: 2, completed: 3 },
@@ -272,7 +272,7 @@ describe("server session", () => {
     const assistant = (id: string, created: number) => ({
       id,
       type: "assistant" as const,
-      agent: "build",
+      agent: "operator",
       model: { id: "model", providerID: "provider" },
       content: [{ type: "text" as const, text: id }],
       time: { created, completed: created },
@@ -1619,7 +1619,7 @@ describe("server session", () => {
         parentID: "parent",
         modelID: "model",
         providerID: "provider",
-        mode: "build",
+        mode: "operator",
         agent: "agent",
         path: { cwd: "/repo", root: "/repo" },
         cost: 0,

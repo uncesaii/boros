@@ -6,7 +6,7 @@ import { createPromptInputV2Store } from "./store"
 import { createEffect } from "solid-js"
 
 const agents = [
-  { id: "build", label: "Build" },
+  { id: "operator", label: "Build" },
   { id: "plan", label: "Plan" },
   { id: "review", label: "Review" },
 ]
@@ -106,7 +106,7 @@ const commandSuggestions: PromptInputV2Suggestion[] = [
 
 function ControlledPromptInput() {
   // Agent choice is a persisted user/workspace preference in v1, not part of PromptStore.
-  const [preferences, setPreferences] = createStore({ agent: "build" })
+  const [preferences, setPreferences] = createStore({ agent: "operator" })
 
   const [runtime, setRuntime] = createStore({
     stopping: false,

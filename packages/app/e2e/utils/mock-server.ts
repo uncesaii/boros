@@ -43,7 +43,7 @@ export async function mockOpenCodeServer(page: Page, config: MockServerConfig) {
     },
     "/project": [config.project],
     "/project/current": config.project,
-    "/agent": [{ name: "build", mode: "primary" }],
+    "/agent": [{ name: "operator", mode: "primary" }],
     "/vcs": { branch: "main", default_branch: "main" },
     "/session": config.sessions,
   }
@@ -125,7 +125,7 @@ export async function mockOpenCodeServer(page: Page, config: MockServerConfig) {
         location: location(config),
         data: [
           {
-            id: "build",
+            id: "operator",
             name: "Build",
             mode: "primary",
             hidden: false,
@@ -343,7 +343,7 @@ export function currentSession(session: { id: string } & Record<string, unknown>
     id: session.id,
     parentID: session.parentID,
     projectID: session.projectID ?? "project",
-    agent: session.agent ?? "build",
+    agent: session.agent ?? "operator",
     model: session.model ?? { id: "mock-model", providerID: "mock-provider" },
     cost: session.cost ?? 0,
     tokens: session.tokens ?? { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
@@ -383,7 +383,7 @@ function currentMessage(value: unknown) {
     id: item.info.id,
     type: "assistant",
     time: item.info.time,
-    agent: item.info.agent ?? "build",
+    agent: item.info.agent ?? "operator",
     model: { id: item.info.modelID ?? "model", providerID: item.info.providerID ?? "provider" },
     cost: item.info.cost,
     tokens: item.info.tokens,
