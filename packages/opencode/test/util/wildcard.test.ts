@@ -44,7 +44,7 @@ test("allStructured matches command sequences", () => {
     "git status*": "allow",
   }
   expect(Wildcard.allStructured({ head: "git", tail: ["status", "--short"] }, rules)).toBe("allow")
-  expect(Wildcard.allStructured({ head: "npm", tail: ["run", "build", "--watch"] }, { "npm run *": "allow" })).toBe(
+  expect(Wildcard.allStructured({ head: "npm", tail: ["run", "operator", "--watch"] }, { "npm run *": "allow" })).toBe(
     "allow",
   )
   expect(Wildcard.allStructured({ head: "ls", tail: ["-la"] }, rules)).toBeUndefined()

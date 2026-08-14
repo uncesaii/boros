@@ -144,10 +144,10 @@ function AssistantSummaryBeforeInlineFixture() {
   return (
     <box flexDirection="column" width={72}>
       <box ref={(el: BoxRenderable) => alwaysSeparate.add(el)} paddingLeft={3}>
-        <text>▣ Build · Little Frank · 53.1s</text>
+        <text>▣ Operator · Little Frank · 53.1s</text>
       </box>
       <InlineToolRow icon="✓" complete={true} pending="">
-        {"Build Task — Review changes\n↳ 48 toolcalls · 1m 40s"}
+        {"Operator Task — Review changes\n↳ 48 toolcalls · 1m 40s"}
       </InlineToolRow>
     </box>
   )
@@ -166,7 +166,7 @@ function AssistantErrorBeforeInlineFixture() {
         <text>Managed inference requires an active Member plan</text>
       </box>
       <InlineToolRow icon="✓" complete={true} pending="">
-        {"Build Task — Review changes\n↳ 48 toolcalls · 1m 40s"}
+        {"Operator Task — Review changes\n↳ 48 toolcalls · 1m 40s"}
       </InlineToolRow>
     </box>
   )

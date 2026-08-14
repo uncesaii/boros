@@ -12,18 +12,18 @@ describe("hasCustomAgent", () => {
 })
 
 describe("resolveAgent", () => {
-  const agents = [{ name: "plan" }, { name: "build" }, { name: "custom" }]
+  const agents = [{ name: "plan" }, { name: "operator" }, { name: "custom" }]
 
   test("uses the requested available agent", () => {
     expect(resolveAgent(agents, "custom")?.name).toBe("custom")
   })
 
-  test("defaults to build", () => {
-    expect(resolveAgent(agents)?.name).toBe("build")
-    expect(resolveAgent(agents, "missing")?.name).toBe("build")
+  test("defaults to operator", () => {
+    expect(resolveAgent(agents)?.name).toBe("operator")
+    expect(resolveAgent(agents, "missing")?.name).toBe("operator")
   })
 
-  test("uses the first agent when build is unavailable", () => {
+  test("uses the first agent when operator is unavailable", () => {
     expect(resolveAgent([{ name: "custom" }], "missing")?.name).toBe("custom")
   })
 })

@@ -180,7 +180,7 @@ describe("PermissionV2", () => {
         .pipe(Effect.orDie)
       const agents = yield* AgentV2.Service
       yield* agents.transform((editor) =>
-        editor.update(AgentV2.ID.make("build"), (agent) => {
+        editor.update(AgentV2.ID.make("operator"), (agent) => {
           agent.permissions = [{ action: "todowrite", resource: "*", effect: "allow" }]
         }),
       )
@@ -207,7 +207,7 @@ describe("PermissionV2", () => {
       const agents = yield* AgentV2.Service
       yield* agents.transform((editor) => {
         editor.remove(AgentV2.ID.make("test"))
-        editor.remove(AgentV2.ID.make("build"))
+        editor.remove(AgentV2.ID.make("operator"))
       })
 
       const service = yield* PermissionV2.Service

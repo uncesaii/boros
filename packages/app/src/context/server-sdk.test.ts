@@ -124,7 +124,7 @@ describe("enqueueServerEvent", () => {
           sessionID: "session",
           role: "user",
           time: { created: 1 },
-          agent: "build",
+          agent: "operator",
           model: { providerID: "provider", modelID: "model" },
         },
       },

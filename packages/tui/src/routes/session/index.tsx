@@ -325,7 +325,7 @@ export function Session() {
     if (part.id === lastSwitch) return
 
     if (part.tool === "plan_exit") {
-      local.agent.set("build")
+      local.agent.set("operator")
       lastSwitch = part.id
     } else if (part.tool === "plan_enter") {
       local.agent.set("plan")
@@ -1549,7 +1549,7 @@ function AssistantMessage(props: { message: AssistantMessage; parts: Part[]; las
               <Show
                 when={
                   props.message.agent &&
-                  props.message.agent.toLowerCase() !== "build" &&
+                  props.message.agent.toLowerCase() !== "operator" &&
                   props.message.agent.toLowerCase() !== props.message.mode.toLowerCase()
                 }
               >

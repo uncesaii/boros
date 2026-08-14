@@ -15,8 +15,14 @@ import { HomeSessionDestinationProvider } from "./home/session-destination"
 
 let once = false
 const placeholder = {
-  normal: ["Fix a TODO in the codebase", "What is the tech stack of this project?", "Fix broken tests"],
-  shell: ["ls -la", "git status", "pwd"],
+  normal: [
+    "Recon a target and map its attack surface",
+    "Enumerate open services and versions",
+    "Exploit a discovered CVE for initial access",
+    "Escalate privileges to root",
+    "Capture a flag and prove the compromise",
+  ],
+  shell: ["nmap -sV -sC target", "subfinder -d target.com", "curl -i http://target", "whoami; id"],
 }
 
 export function Home() {
