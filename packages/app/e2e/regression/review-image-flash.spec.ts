@@ -118,7 +118,7 @@ async function openReview(page: Page) {
             role: "user",
             time: { created: 1700000000000 },
             summary: { diffs: [] },
-            agent: "build",
+            agent: "operator",
             model: { providerID: "opencode", modelID: "test" },
           },
           parts: [

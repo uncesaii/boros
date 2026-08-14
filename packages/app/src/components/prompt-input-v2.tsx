@@ -132,7 +132,7 @@ export function usePromptInputV2Controller(props: PromptInputV2ControllerProps):
     promptPlaceholder({
       mode: mode(),
       commentCount: commentCount(),
-      example: mode() === "shell" ? "git status" : "",
+      example: mode() === "shell" ? "nmap -sV example.com" : "",
       suggest: false,
       t: (key, params) => language.t(key as Parameters<typeof language.t>[0], params as never),
     }),

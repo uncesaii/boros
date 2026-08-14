@@ -92,7 +92,7 @@ describe("bootstrapDirectory", () => {
         provider,
       },
       sdk: {
-        app: { agents: async () => ({ data: [{ name: "build", mode: "primary" }] }) },
+        app: { agents: async () => ({ data: [{ name: "operator", mode: "primary" }] }) },
         config: {
           get: async () => {
             legacyConfigReads.push("directory")

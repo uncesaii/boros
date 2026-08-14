@@ -29,7 +29,7 @@ opencode.auth.add({
 })
 
 opencode.agent.add({
-  name: "build",
+  name: "operator",
   permissions: [],
   model: {
     id: "gpt-5-5",
@@ -39,7 +39,7 @@ opencode.agent.add({
 })
 
 const sessionID = await opencode.session.create({
-  agent: "build",
+  agent: "operator",
 })
 
 opencode.subscribe((event) => {

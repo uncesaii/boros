@@ -76,9 +76,9 @@ exports[`TUI inline tool wrapping separates a task row from a preceding inline d
 `;
 
 exports[`TUI inline tool wrapping separates an inline row from the previous assistant summary 1`] = `
-"   ▣ Build · Little Frank · 53.1s
+"   ▣ Operator · Little Frank · 53.1s
 
-   ✓ Build Task — Review changes
+   ✓ Operator Task — Review changes
      ↳ 48 toolcalls · 1m 40s"
 `;
 
@@ -87,6 +87,6 @@ exports[`TUI inline tool wrapping separates an inline row from the previous assi
 │  Managed inference requires an active Member plan
 │
 
-   ✓ Build Task — Review changes
+   ✓ Operator Task — Review changes
      ↳ 48 toolcalls · 1m 40s"
 `;

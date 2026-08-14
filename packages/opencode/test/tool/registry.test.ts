@@ -154,7 +154,7 @@ describe("tool.registry", () => {
     Effect.gen(function* () {
       const registry = yield* ToolRegistry.Service
       const agent = yield* Agent.Service
-      const build = yield* agent.get("build")
+      const build = yield* agent.get("operator")
       if (!build) throw new Error("build agent not found")
       const task = (yield* registry.tools({
         providerID: ProviderV2.ID.opencode,

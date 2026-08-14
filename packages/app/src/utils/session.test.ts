@@ -7,7 +7,7 @@ describe("normalizeSessionInfo", () => {
     const result = normalizeSessionInfo({
       id: "session-1",
       projectID: "project-1",
-      agent: "build",
+      agent: "operator",
       model: { id: "gpt-5", providerID: "openai", variant: "high" },
       cost: 0,
       tokens: { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
@@ -29,7 +29,7 @@ describe("normalizeSessionInfo", () => {
       cost: 0,
       tokens: { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
       title: "New session",
-      agent: "build",
+      agent: "operator",
       model: { id: "gpt-5", providerID: "openai", variant: "high" },
       version: "",
       time: { created: 1, updated: 1 },
@@ -91,7 +91,7 @@ function sessionInfo(id: string, archived = false) {
   return {
     id,
     projectID: "project-1",
-    agent: "build",
+    agent: "operator",
     model: { id: "model-1", providerID: "provider-1" },
     cost: 0,
     tokens: { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
