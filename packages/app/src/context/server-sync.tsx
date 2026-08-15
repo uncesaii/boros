@@ -33,7 +33,7 @@ import type { ProjectMeta } from "./global-sync/types"
 import { SESSION_RECENT_LIMIT } from "./global-sync/types"
 import { formatServerError } from "@/utils/server-errors"
 import { queryOptions, useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/solid-query"
-import type { SolidQueryOptions } from "@tanstack/solid-query"
+import type { QueryOptions } from "@tanstack/solid-query"
 import { createRefreshQueue } from "./global-sync/queue"
 import { directoryKey } from "./global-sync/utils"
 import { PathKey } from "@/utils/path-key"
@@ -81,7 +81,7 @@ type McpResourceApi = {
   }
 }
 
-type ApiQueryOptions<T, K extends readonly unknown[]> = SolidQueryOptions<T, Error, T, K> & {
+type ApiQueryOptions<T, K extends readonly unknown[]> = QueryOptions<T, Error, T, K> & {
   initialData?: undefined
   queryKey: K
 }

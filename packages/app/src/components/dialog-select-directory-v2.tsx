@@ -61,6 +61,7 @@ export function DialogSelectDirectoryV2(props: DialogSelectDirectoryV2Props) {
   const listings = new Map<string, Promise<Array<{ name: string; type: "file" | "directory" }> | undefined>>()
   const loads = createPriorityTaskQueue<Array<{ name: string; type: "file" | "directory" }> | undefined>(3)
   const advanced = new Set<string>()
+  const startLoading = new Set<string>()
   let tree: FileTree | undefined
   let container: HTMLDivElement | undefined
   let pathArea: HTMLDivElement | undefined
@@ -165,6 +166,7 @@ export function DialogSelectDirectoryV2(props: DialogSelectDirectoryV2Props) {
     setInput(displayPickerPath(value, value, home()))
     listings.clear()
     advanced.clear()
+    startLoading.clear()
     tree?.resetPaths([])
     const valid = await load("", token)
     if (!activeTreeNavigation(token, navigation)) return
@@ -262,9 +264,6 @@ export function DialogSelectDirectoryV2(props: DialogSelectDirectoryV2Props) {
           scrollbar-width: thin;
         }
       `,
-      onExpansionChange(change) {
-        if (change.expanded) void load(change.path, navigation)
-      },
       onSelectionChange(paths) {
         const path = paths.at(-1)
         setSelected(path ? (policy.selection(root(), path) ?? "") : "")
@@ -273,6 +272,18 @@ export function DialogSelectDirectoryV2(props: DialogSelectDirectoryV2Props) {
     if (!container) return
     tree.render({ containerWrapper: container })
     tree.getFileTreeContainer()?.classList.add("directory-picker-v2-tree")
+    tree.subscribe(() => {
+      const count = tree?.getVisibleCount() ?? 0
+      const rows = tree?.getVisibleRows(0, count) ?? []
+      const dirs: string[] = []
+      for (const row of rows) {
+        if (row.kind === "directory" && row.isExpanded && !startLoading.has(row.path)) {
+          startLoading.add(row.path)
+          dirs.push(row.path)
+        }
+      }
+      for (const path of dirs) void load(path, navigation)
+    })
   })
 
   createEffect(() => {
