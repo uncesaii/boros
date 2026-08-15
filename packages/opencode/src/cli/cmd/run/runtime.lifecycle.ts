@@ -198,7 +198,7 @@ export async function createRuntimeLifecycle(input: LifecycleInput): Promise<Lif
     const keymap = createDefaultOpenTuiKeymap(renderer)
     unregisterKeymap = registerBorosKeymap(
       keymap as unknown as Parameters<typeof registerBorosKeymap>[0],
-      renderer,
+      renderer as unknown as Parameters<typeof registerBorosKeymap>[1],
       input.tuiConfig,
     )
     const state: SplashState = {

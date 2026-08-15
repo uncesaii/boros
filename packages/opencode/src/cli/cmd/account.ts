@@ -73,7 +73,7 @@ const loginEffect = Effect.fn("login")(function* (url: string) {
       }),
     PollExpired: () => s.stop("Device code expired"),
     PollDenied: () => s.stop("Authorization denied"),
-    PollError: (r) => s.stop("Error: " + String(r.cause), 1),
+    PollError: (r) => s.stop("Error: " + String(r.cause)),
     PollPending: () => s.stop("Unexpected state"),
     PollSlow: () => s.stop("Unexpected state"),
   })

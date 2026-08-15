@@ -990,14 +990,14 @@ function mcpRegistrationKey(name: string, config: ReturnType<typeof mcpConfig>) 
 }
 
 function mcpConfig(server: McpServer) {
-  if (server.type === "http" || server.type === "sse") {
-    return {
-      type: "remote" as const,
-      url: server.url,
-      headers: Object.fromEntries(server.headers.map((header) => [header.name, header.value])),
+  if ("type" in server) {
+    if (server.type === "http" || server.type === "sse") {
+      return {
+        type: "remote" as const,
+        url: server.url,
+        headers: Object.fromEntries(server.headers.map((header) => [header.name, header.value])),
+      }
     }
-  }
-  if (server.type === "acp") {
     return undefined
   }
   return {

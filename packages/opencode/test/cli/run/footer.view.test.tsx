@@ -179,7 +179,11 @@ async function renderFooter(
   function Harness() {
     const renderer = useRenderer()
     const keymap = createDefaultOpenTuiKeymap(renderer) as unknown as Parameters<typeof registerBorosKeymap>[0]
-    offKeymap = registerBorosKeymap(keymap, renderer, config)
+    offKeymap = registerBorosKeymap(
+      keymap as unknown as Parameters<typeof registerBorosKeymap>[0],
+      renderer as unknown as Parameters<typeof registerBorosKeymap>[1],
+      config,
+    )
 
     return (
       <BorosKeymapProvider keymap={keymap}>
@@ -962,7 +966,11 @@ test("direct footer shows editable prompts and additional queued work while runn
   function Harness() {
     const renderer = useRenderer()
     const keymap = createDefaultOpenTuiKeymap(renderer) as unknown as Parameters<typeof registerBorosKeymap>[0]
-    offKeymap = registerBorosKeymap(keymap, renderer, tuiConfig)
+    offKeymap = registerBorosKeymap(
+      keymap as unknown as Parameters<typeof registerBorosKeymap>[0],
+      renderer as unknown as Parameters<typeof registerBorosKeymap>[1],
+      tuiConfig,
+    )
 
     return (
       <BorosKeymapProvider keymap={keymap}>
@@ -1232,7 +1240,11 @@ test.skip("direct custom answer submits through keymap return binding", async ()
   function Harness() {
     const renderer = useRenderer()
     const keymap = createDefaultOpenTuiKeymap(renderer) as unknown as Parameters<typeof registerBorosKeymap>[0]
-    off = registerBorosKeymap(keymap, renderer, tuiConfig)
+    off = registerBorosKeymap(
+      keymap as unknown as Parameters<typeof registerBorosKeymap>[0],
+      renderer as unknown as Parameters<typeof registerBorosKeymap>[1],
+      tuiConfig,
+    )
 
     return (
       <BorosKeymapProvider keymap={keymap}>
@@ -1282,7 +1294,11 @@ test("direct permission rejection submits through keymap return binding", async 
   function Harness() {
     const renderer = useRenderer()
     const keymap = createDefaultOpenTuiKeymap(renderer) as unknown as Parameters<typeof registerBorosKeymap>[0]
-    off = registerBorosKeymap(keymap, renderer, tuiConfig)
+    off = registerBorosKeymap(
+      keymap as unknown as Parameters<typeof registerBorosKeymap>[0],
+      renderer as unknown as Parameters<typeof registerBorosKeymap>[1],
+      tuiConfig,
+    )
 
     return (
       <BorosKeymapProvider keymap={keymap}>

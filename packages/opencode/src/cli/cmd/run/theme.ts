@@ -681,7 +681,7 @@ export async function resolveRunTheme(renderer: CliRenderer): Promise<RunTheme> 
       footerTheme,
       scrollbackTheme,
       splashTheme(scrollbackTheme, indexed),
-      syntax,
+      syntax as unknown as SyntaxStyle,
       shared.generateSubtleSyntax(syntaxTheme as unknown as Parameters<typeof shared.generateSubtleSyntax>[0]),
     )
   } catch {
