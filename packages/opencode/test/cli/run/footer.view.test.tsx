@@ -178,7 +178,7 @@ async function renderFooter(
 
   function Harness() {
     const renderer = useRenderer()
-    const keymap = createDefaultOpenTuiKeymap(renderer)
+    const keymap = createDefaultOpenTuiKeymap(renderer) as unknown as Parameters<typeof registerBorosKeymap>[0]
     offKeymap = registerBorosKeymap(keymap, renderer, config)
 
     return (
@@ -961,7 +961,7 @@ test("direct footer shows editable prompts and additional queued work while runn
   let offKeymap: (() => void) | undefined
   function Harness() {
     const renderer = useRenderer()
-    const keymap = createDefaultOpenTuiKeymap(renderer)
+    const keymap = createDefaultOpenTuiKeymap(renderer) as unknown as Parameters<typeof registerBorosKeymap>[0]
     offKeymap = registerBorosKeymap(keymap, renderer, tuiConfig)
 
     return (
@@ -1231,7 +1231,7 @@ test.skip("direct custom answer submits through keymap return binding", async ()
 
   function Harness() {
     const renderer = useRenderer()
-    const keymap = createDefaultOpenTuiKeymap(renderer)
+    const keymap = createDefaultOpenTuiKeymap(renderer) as unknown as Parameters<typeof registerBorosKeymap>[0]
     off = registerBorosKeymap(keymap, renderer, tuiConfig)
 
     return (
@@ -1281,7 +1281,7 @@ test("direct permission rejection submits through keymap return binding", async 
 
   function Harness() {
     const renderer = useRenderer()
-    const keymap = createDefaultOpenTuiKeymap(renderer)
+    const keymap = createDefaultOpenTuiKeymap(renderer) as unknown as Parameters<typeof registerBorosKeymap>[0]
     off = registerBorosKeymap(keymap, renderer, tuiConfig)
 
     return (

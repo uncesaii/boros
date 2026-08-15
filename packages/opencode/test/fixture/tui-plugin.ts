@@ -217,7 +217,7 @@ export function createTuiPluginApi(opts: Opts = {}): HostPluginApi {
         }
       },
     },
-    renderer,
+    renderer: renderer as unknown as HostPluginApi["renderer"],
     slots: {
       register: () => "fixture-slot",
     },

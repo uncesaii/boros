@@ -301,7 +301,7 @@ export class RunFooter implements FooterApi {
     void render(
       () =>
         createComponent(BorosKeymapProvider, {
-          keymap: options.keymap,
+          keymap: options.keymap as unknown as Parameters<typeof BorosKeymapProvider>[0]["keymap"],
           get children() {
             return createComponent(RunFooterView, {
               directory: options.directory,
