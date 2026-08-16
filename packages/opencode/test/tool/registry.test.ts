@@ -335,7 +335,7 @@ describe("tool.registry", () => {
 
       const agents = yield* Agent.Service
       const promptTools = yield* registry.tools({
-        providerID: ProviderV2.ID.opencode,
+        providerID: ProviderV2.ID.openai,
         modelID: ModelV2.ID.make("test"),
         agent: yield* agents.defaultInfo(),
       })
