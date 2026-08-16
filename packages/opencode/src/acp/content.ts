@@ -170,17 +170,6 @@ function uriToFilePart(
         mime,
       }
     }
-    if (uri.startsWith("zed://")) {
-      const pathname = new URL(uri).searchParams.get("path")
-      if (pathname) {
-        return {
-          type: "file",
-          url: pathToFileURL(pathname).href,
-          filename: filename ?? (path.basename(pathname) || "file"),
-          mime,
-        }
-      }
-    }
     return { type: "text", text: uri }
   } catch {
     return { type: "text", text: uri }

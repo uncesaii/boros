@@ -26,7 +26,6 @@
     "./context/clipboard": "./src/context/clipboard.tsx",
     "./attention": "./src/attention.ts",
     "./editor": "./src/editor.ts",
-    "./editor-zed": "./src/editor-zed.ts",
     "./runtime": "./src/runtime.tsx",
     "./terminal-win32": "./src/terminal-win32.ts",
     "./config/keybind": "./src/config/keybind.ts",

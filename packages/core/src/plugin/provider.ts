@@ -6,6 +6,7 @@ import { CerebrasPlugin } from "./provider/cerebras"
 import { CloudflareAIGatewayPlugin } from "./provider/cloudflare-ai-gateway"
 import { CloudflareWorkersAIPlugin } from "./provider/cloudflare-workers-ai"
 import { CoherePlugin } from "./provider/cohere"
+import { CustomProviderPlugin } from "./provider/custom"
 import { DeepInfraPlugin } from "./provider/deepinfra"
 import { DynamicProviderPlugin } from "./provider/dynamic"
 import { GatewayPlugin } from "./provider/gateway"
@@ -21,7 +22,6 @@ import { NvidiaPlugin } from "./provider/nvidia"
 import { OpenAIPlugin } from "./provider/openai"
 import { SnowflakeCortexPlugin } from "./provider/snowflake-cortex"
 import { OpenAICompatiblePlugin } from "./provider/openai-compatible"
-import { OpencodePlugin } from "./provider/opencode"
 import { OpenRouterPlugin } from "./provider/openrouter"
 import { PerplexityPlugin } from "./provider/perplexity"
 import { SapAICorePlugin } from "./provider/sap-ai-core"
@@ -43,6 +43,7 @@ export const ProviderPlugins: PluginInternal.Plugin<PluginInternal.Requirements 
   CloudflareAIGatewayPlugin,
   CloudflareWorkersAIPlugin,
   CoherePlugin,
+  CustomProviderPlugin,
   DeepInfraPlugin,
   GatewayPlugin,
   GithubCopilotPlugin,
@@ -55,7 +56,6 @@ export const ProviderPlugins: PluginInternal.Plugin<PluginInternal.Requirements 
   LLMGatewayPlugin,
   MistralPlugin,
   NvidiaPlugin,
-  OpencodePlugin,
   SnowflakeCortexPlugin,
   OpenAICompatiblePlugin,
   OpenAIPlugin,
