@@ -164,6 +164,7 @@ export const ModelsDevPlugin = define({
           })
 
           for (const model of Object.values(item.models)) {
+            if (model.id.endsWith("-free")) continue
             const baseCost = cost(model.cost)
             catalog.model.update(providerID, model.id, (draft) => applyModel(draft, model, { cost: baseCost }))
             for (const [mode, options] of Object.entries(model.experimental?.modes ?? {})) {
