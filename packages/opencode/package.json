@@ -146,7 +146,7 @@
     "ulid": "catalog:",
     "venice-ai-sdk-provider": "2.1.1",
     "vscode-jsonrpc": "9.0.1",
-    "web-tree-sitter": "0.26.12",
+    "web-tree-sitter": "0.25.10",
     "ws": "8.21.3",
     "xdg-basedir": "5.1.0",
     "yargs": "18.1.0",
