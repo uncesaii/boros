@@ -486,34 +486,6 @@
         "@opentui/solid",
       ],
     },
-    "packages/plugin": {
-      "name": "@opencode-ai/plugin",
-      "dependencies": {
-        "@ai-sdk/provider": "3.0.8",
-        "@opencode-ai/sdk": "workspace:*",
-        "effect": "catalog:",
-        "zod": "catalog:",
-      },
-      "devDependencies": {
-        "@opentui/core": "catalog:",
-        "@opentui/keymap": "catalog:",
-        "@opentui/solid": "catalog:",
-        "@tsconfig/node22": "catalog:",
-        "@types/node": "catalog:",
-        "@typescript/native-preview": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "@opentui/core": ">=0.4.5",
-        "@opentui/keymap": ">=0.4.5",
-        "@opentui/solid": ">=0.4.5",
-      },
-      "optionalPeers": [
-        "@opentui/core",
-        "@opentui/keymap",
-        "@opentui/solid",
-      ],
-    },
     "packages/protocol": {
       "name": "@boros-ai/protocol",
       "dependencies": {
@@ -550,20 +522,6 @@
     "packages/sdk/js": {
       "name": "@boros-ai/sdk",
       "version": "1.18.13",
-      "dependencies": {
-        "cross-spawn": "catalog:",
-      },
-      "devDependencies": {
-        "@hey-api/openapi-ts": "0.99.0",
-        "@tsconfig/node22": "catalog:",
-        "@types/cross-spawn": "catalog:",
-        "@types/node": "catalog:",
-        "@typescript/native-preview": "catalog:",
-        "typescript": "catalog:",
-      },
-    },
-    "packages/sdk/js": {
-      "name": "@opencode-ai/sdk",
       "dependencies": {
         "cross-spawn": "catalog:",
       },
@@ -733,6 +691,7 @@
     "@dnd-kit/dom@0.5.0": "patches/@dnd-kit%2Fdom@0.5.0.patch",
   },
   "overrides": {
+    "@opencode-ai/plugin": "workspace:packages/plugin",
     "@opentui/core": "catalog:",
     "@opentui/keymap": "catalog:",
     "@opentui/solid": "catalog:",
@@ -1374,9 +1333,7 @@
 
     "@openauthjs/openauth": ["@openauthjs/openauth@0.0.0-20250322224806", "", { "dependencies": { "@standard-schema/spec": "1.0.0-beta.3", "aws4fetch": "1.0.20", "jose": "5.9.6" }, "peerDependencies": { "arctic": "^2.2.2", "hono": "^4.0.0" } }, "sha512-p5IWSRXvABcwocH2dNI0w8c1QJelIOFulwhKk+aLLFfUbs8u1pr7kQbYe8yCSM2+bcLHiwbogpUQc2ovrGwCuw=="],
 
-    "@opencode-ai/plugin": ["@opencode-ai/plugin@workspace:packages/plugin"],
-
-    "@opencode-ai/sdk": ["@opencode-ai/sdk@workspace:packages/sdk/js"],
+    "@opencode-ai/plugin": ["@boros-ai/plugin@workspace:packages/plugin"],
 
     "@openrouter/ai-sdk-provider": ["@openrouter/ai-sdk-provider@2.9.0", "", { "peerDependencies": { "ai": "^6.0.0", "zod": "^3.25.0 || ^4.0.0" } }, "sha512-Seva+NCa0WUQnJIUE5GzHsUv1WTIeyqwz0ELl2VtS6NP+eF+77yCXGFVOMbvoCM7QMjlnhv7931e89R+8pJdcQ=="],
 
