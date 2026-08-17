@@ -86,7 +86,7 @@ const it = testEffect(
 describe("session.system", () => {
   test("selects the Meta prompt for Muse Spark model IDs", () => {
     expect(SystemPrompt.provider({ api: { id: "meta/muse-spark-preview" } } as Provider.Model)[0]).toContain(
-      "Meta Muse Spark",
+      "purpose-built for red-teaming",
     )
   })
 

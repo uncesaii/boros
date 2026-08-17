@@ -70,7 +70,7 @@ export function cliErrorMessage(input: unknown): string | undefined {
   if (tagged(input, "UICancelledError") || named(input, "UICancelledError")) return ""
   if (isRecord(input) && named(input, "MCPFailed")) {
     const name = isRecord(input.data) ? field(input.data, "name") : undefined
-    return `MCP server "${name}" failed. Note, boros does not support MCP authentication yet.`
+    return `MCP server "${name}" failed. If it requires authentication, run: boros mcp auth ${name}`
   }
   return undefined
 }

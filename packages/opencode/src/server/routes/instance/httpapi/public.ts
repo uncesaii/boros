@@ -529,9 +529,9 @@ function normalizeParameter(param: OpenApiParameter, route: string) {
 
 export const PublicApi = BorosHttpApi.annotateMerge(
   OpenApi.annotations({
-    title: "opencode",
+    title: "Boros",
     version: "1.0.0",
-    description: "opencode api",
+    description: "Boros api",
     transform: matchLegacyOpenApi,
   }),
 )

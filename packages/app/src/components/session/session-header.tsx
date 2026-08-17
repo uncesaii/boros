@@ -37,7 +37,6 @@ import { useTitlebarRightMount } from "../titlebar"
 const OPEN_APPS = [
   "vscode",
   "cursor",
-  "zed",
   "textmate",
   "antigravity",
   "finder",
@@ -62,7 +61,6 @@ const MAC_APPS = [
     openWith: "Visual Studio Code",
   },
   { id: "cursor", label: "session.header.open.app.cursor", icon: "cursor", openWith: "Cursor" },
-  { id: "zed", label: "session.header.open.app.zed", icon: "zed", openWith: "Zed" },
   { id: "textmate", label: "session.header.open.app.textmate", icon: "textmate", openWith: "TextMate" },
   {
     id: "antigravity",
@@ -92,7 +90,6 @@ const MAC_APPS = [
 const WINDOWS_APPS = [
   { id: "vscode", label: "session.header.open.app.vscode", icon: "vscode", openWith: "code" },
   { id: "cursor", label: "session.header.open.app.cursor", icon: "cursor", openWith: "cursor" },
-  { id: "zed", label: "session.header.open.app.zed", icon: "zed", openWith: "zed" },
   {
     id: "powershell",
     label: "session.header.open.app.powershell",
@@ -110,7 +107,6 @@ const WINDOWS_APPS = [
 const LINUX_APPS = [
   { id: "vscode", label: "session.header.open.app.vscode", icon: "vscode", openWith: "code" },
   { id: "cursor", label: "session.header.open.app.cursor", icon: "cursor", openWith: "cursor" },
-  { id: "zed", label: "session.header.open.app.zed", icon: "zed", openWith: "zed" },
   {
     id: "sublime-text",
     label: "session.header.open.app.sublimeText",

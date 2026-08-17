@@ -365,15 +365,13 @@ function ApiMethod(props: ApiMethodProps) {
       title={props.title}
       placeholder="API key"
       description={() =>
-        ({
-          custom: (
-            <box gap={1}>
-              <text fg={theme.textMuted}>
-                Enter the API key for your custom OpenAI-compatible endpoint.
-              </text>
-            </box>
-          ),
-        })[props.providerID] ?? undefined
+        props.custom ? (
+          <box gap={1}>
+            <text fg={theme.textMuted}>
+              Enter the API key for your custom OpenAI-compatible endpoint.
+            </text>
+          </box>
+        ) : undefined
       }
       onConfirm={async (value) => {
         if (!value) return
