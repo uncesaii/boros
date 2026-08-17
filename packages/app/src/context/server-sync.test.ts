@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test"
-import type { OpencodeClient } from "@opencode-ai/sdk/v2/client"
+import type { OpencodeClient } from "@boros-ai/sdk/v2/client"
 import type {
   McpListInput,
   McpResourceCatalogInput,
   SessionApi,
   SessionInfo,
   SessionListInput,
-} from "@opencode-ai/client/promise"
+} from "@boros-ai/client/promise"
 import { QueryClient } from "@tanstack/solid-query"
 import { canDisposeDirectory, pickDirectoriesToEvict } from "./global-sync/eviction"
 import { estimateRootSessionTotal, loadRootSessions } from "./global-sync/session-load"

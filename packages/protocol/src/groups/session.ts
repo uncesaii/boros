@@ -1,10 +1,10 @@
-import { SessionMessage } from "@opencode-ai/schema/session-message"
-import { SessionInput } from "@opencode-ai/schema/session-input"
-import { PromptInput } from "@opencode-ai/schema/prompt-input"
-import { Session } from "@opencode-ai/schema/session"
-import { Project } from "@opencode-ai/schema/project"
-import { AbsolutePath, NonNegativeInt, PositiveInt, RelativePath, statics } from "@opencode-ai/schema/schema"
-import { Workspace } from "@opencode-ai/schema/workspace"
+import { SessionMessage } from "@boros-ai/schema/session-message"
+import { SessionInput } from "@boros-ai/schema/session-input"
+import { PromptInput } from "@boros-ai/schema/prompt-input"
+import { Session } from "@boros-ai/schema/session"
+import { Project } from "@boros-ai/schema/project"
+import { AbsolutePath, NonNegativeInt, PositiveInt, RelativePath, statics } from "@boros-ai/schema/schema"
+import { Workspace } from "@boros-ai/schema/workspace"
 import { Context, Effect, Encoding, Result, Schema, Struct } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, HttpApiMiddleware, HttpApiSchema, OpenApi } from "effect/unstable/httpapi"
 import {
@@ -16,11 +16,11 @@ import {
   SessionNotFoundError,
   UnknownError,
 } from "../errors"
-import { Agent } from "@opencode-ai/schema/agent"
-import { Model } from "@opencode-ai/schema/model"
-import { Location } from "@opencode-ai/schema/location"
-import { Revert } from "@opencode-ai/schema/revert"
-import { SessionEvent } from "@opencode-ai/schema/session-event"
+import { Agent } from "@boros-ai/schema/agent"
+import { Model } from "@boros-ai/schema/model"
+import { Location } from "@boros-ai/schema/location"
+import { Revert } from "@boros-ai/schema/revert"
+import { SessionEvent } from "@boros-ai/schema/session-event"
 
 const SessionsQueryFields = {
   workspace: Workspace.ID.pipe(Schema.optional),

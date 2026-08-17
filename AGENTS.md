@@ -20,7 +20,7 @@ engagement — reconnaissance, exploitation, privilege escalation, web-target
 triage — autonomously, with every step human-reviewable in the terminal.
 
 - The core is Effect v4 (`effect` catalog), with the package graph directed
-  Schema → Core → Protocol → Server; the CLI lives in `packages/opencode`.
+  Schema → Core → Protocol → Server; the CLI lives in `packages/boros`.
 - CI gates every change: `bun typecheck`, `bun turbo test`, and a build smoke
   via `ci.yml`; releases are tag-driven (`v*` → native binaries for 12
   platforms + npm publishing).
@@ -187,7 +187,7 @@ user-facing impact.
 Create a separate visual QA thread only for broad or high-risk UI changes where
 independent review is worth the handoff cost, such as multi-screen flows, many
 responsive states, or a full visual polish pass. For the TUI, capture output
-with `tmux capture-pane` as described in `packages/opencode/AGENTS.md`.
+with `tmux capture-pane` as described in `packages/boros/AGENTS.md`.
 
 ## Manual Verification Notes
 
@@ -249,7 +249,7 @@ const { a, b } = obj
 
 - Never alias imports. Do not use `import { foo as bar } from "..."` or renamed imports like `resolve as pathResolve`.
 - Never use star imports. Do not use `import * as Foo from "..."` or `import type * as Foo from "..."`.
-- If a namespace-style value is needed, import the module's own exported namespace by name, for example `import { Project } from "@opencode-ai/core/project"`, then reference `Project.ID`.
+- If a namespace-style value is needed, import the module's own exported namespace by name, for example `import { Project } from "@boros-ai/core/project"`, then reference `Project.ID`.
 - Prefer dynamic imports for heavy modules that are only needed in selected code paths, especially in startup-sensitive entrypoints. Destructure dynamic import bindings near the top of the narrowest scope that needs them so they read like normal imports. Avoid inline chains such as `await import("./module").then((mod) => mod.value())` or `(await import("./module")).value()`. Keep branch-specific imports inside the branch that needs them to preserve lazy loading.
 
 ### Variables
@@ -331,11 +331,11 @@ const table = sqliteTable("session", {
 
 - Avoid mocks as much as possible, you shouldn't be using globalThis.\* at all unless it's the only option.
 - Test actual implementation, do not duplicate logic into tests
-- Tests cannot run from repo root (guard: `do-not-run-tests-from-root`); run from package dirs like `packages/opencode`.
+- Tests cannot run from repo root (guard: `do-not-run-tests-from-root`); run from package dirs like `packages/boros`.
 
 ## Type Checking
 
-- Always run `bun typecheck` from package directories (e.g., `packages/opencode`), never `tsc` directly.
+- Always run `bun typecheck` from package directories (e.g., `packages/boros`), never `tsc` directly.
 
 ## V2 Session Core
 
@@ -392,7 +392,7 @@ date-stamped branch so it is individually reviewable and traceable:
 
 When the Boros agent reviews a PR, it checks:
 1. No OpenCode paywall/rate-limit upsell paths are reintroduced (see
-   `packages/opencode/src/session/retry.ts`).
+   `packages/boros/src/session/retry.ts`).
 2. All real provider `/model` and `/connect` behavior is preserved.
 3. No OpenCode-only cloud endpoints are introduced into the terminal path.
 4. Native agent/skill registration is consistent with `AGENTS.md` conventions.

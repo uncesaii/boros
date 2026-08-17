@@ -200,7 +200,7 @@ bun install          # set up workspace
 bun run typecheck    # from the package directories
 bun run build        # build all packages
 # native binary:
-bun run --cwd packages/opencode script/build.ts --single
+bun run --cwd packages/boros script/build.ts --single
 ```
 
 ---

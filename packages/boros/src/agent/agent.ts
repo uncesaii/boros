@@ -1,0 +1,727 @@
+import { LayerNode } from "@boros-ai/core/effect/layer-node"
+import { PermissionV1 } from "@boros-ai/core/v1/permission"
+import { Config } from "@/config/config"
+import { serviceUse } from "@boros-ai/core/effect/service-use"
+import { Provider } from "@/provider/provider"
+
+import { generateObject, streamObject, type ModelMessage } from "ai"
+import { Truncate } from "@/tool/truncate"
+import { Auth } from "../auth"
+import { ProviderTransform } from "@/provider/transform"
+
+import PROMPT_GENERATE from "./generate.txt"
+import PROMPT_COMPACTION from "./prompt/compaction.txt"
+import PROMPT_EXPLORE from "./prompt/explore.txt"
+import PROMPT_SUMMARY from "./prompt/summary.txt"
+import PROMPT_TITLE from "./prompt/title.txt"
+import { Permission } from "@/permission"
+import { mergeDeep, pipe, sortBy, values } from "remeda"
+import { Global } from "@boros-ai/core/global"
+import path from "path"
+import { Plugin } from "@/plugin"
+import { Skill } from "../skill"
+import { Effect, Context, Layer, Schema } from "effect"
+import { InstanceState } from "@/effect/instance-state"
+import * as Option from "effect/Option"
+import * as OtelTracer from "@effect/opentelemetry/Tracer"
+import { AbsolutePath, type DeepMutable } from "@boros-ai/core/schema"
+import { ProviderV2 } from "@boros-ai/core/provider"
+import { ModelV2 } from "@boros-ai/core/model"
+import { LocationServiceMap, locationServiceMapLayer } from "@boros-ai/core/location-services"
+import { Reference } from "@boros-ai/core/reference"
+import { Location } from "@boros-ai/core/location"
+import { PluginV2 } from "@boros-ai/core/plugin"
+import {
+  BOROS_DOCTRINE,
+  BOROS_ROOT,
+  BOROS_RECON,
+  BOROS_EXPLOIT,
+  BOROS_EXPLOIT_ENGINEER,
+  BOROS_PRIVESC,
+  BOROS_WEB,
+  BOROS_TRIAGE,
+  BOROS_ASSISTANT,
+  BOROS_CRYPTO,
+  BOROS_LLM,
+  BOROS_POST,
+  BOROS_HARNESS,
+  BOROS_PLAN,
+} from "@boros-ai/core/plugin/agent/prompt/boros-doctrine"
+
+export const Info = Schema.Struct({
+  name: Schema.String,
+  description: Schema.optional(Schema.String),
+  mode: Schema.Literals(["subagent", "primary", "all"]),
+  native: Schema.optional(Schema.Boolean),
+  hidden: Schema.optional(Schema.Boolean),
+  topP: Schema.optional(Schema.Finite),
+  temperature: Schema.optional(Schema.Finite),
+  color: Schema.optional(Schema.String),
+  permission: PermissionV1.Ruleset,
+  model: Schema.optional(
+    Schema.Struct({
+      modelID: ModelV2.ID,
+      providerID: ProviderV2.ID,
+    }),
+  ),
+  variant: Schema.optional(Schema.String),
+  prompt: Schema.optional(Schema.String),
+  options: Schema.Record(Schema.String, Schema.Unknown),
+  steps: Schema.optional(Schema.Finite),
+}).annotate({ identifier: "Agent" })
+export type Info = DeepMutable<Schema.Schema.Type<typeof Info>>
+
+const GeneratedAgent = Schema.Struct({
+  identifier: Schema.String,
+  whenToUse: Schema.String,
+  systemPrompt: Schema.String,
+})
+
+export interface Interface {
+  readonly get: (agent: string) => Effect.Effect<Info>
+  readonly list: () => Effect.Effect<Info[]>
+  readonly defaultInfo: () => Effect.Effect<Info>
+  readonly defaultAgent: () => Effect.Effect<string>
+  readonly generate: (input: {
+    description: string
+    model?: { providerID: ProviderV2.ID; modelID: ModelV2.ID }
+  }) => Effect.Effect<
+    {
+      identifier: string
+      whenToUse: string
+      systemPrompt: string
+    },
+    Provider.DefaultModelError
+  >
+}
+
+type State = Omit<Interface, "generate">
+
+export class Service extends Context.Service<Service, Interface>()("@boros/Agent") {}
+
+export const use = serviceUse(Service)
+
+const layer = Layer.effect(
+  Service,
+  Effect.gen(function* () {
+    const config = yield* Config.Service
+    const auth = yield* Auth.Service
+    const plugin = yield* Plugin.Service
+    const skill = yield* Skill.Service
+    const provider = yield* Provider.Service
+    const locations = yield* LocationServiceMap.Service
+
+    const state = yield* InstanceState.make<State>(
+      Effect.fn("Agent.state")(function* (ctx) {
+        const cfg = yield* config.get()
+        const skillDirs = yield* skill.dirs()
+        const referenceDirs = Object.keys(cfg.references ?? cfg.reference ?? {}).length
+          ? yield* Effect.gen(function* () {
+              yield* (yield* PluginV2.Service).wait(PluginV2.ID.make("core/config-reference"))
+              return (yield* (yield* Reference.Service).list()).map((reference) => reference.path)
+            }).pipe(Effect.provide(locations.get(Location.Ref.make({ directory: AbsolutePath.make(ctx.directory) }))))
+          : []
+        const whitelistedDirs = [
+          Truncate.GLOB,
+          path.join(Global.Path.tmp, "*"),
+          ...skillDirs.map((dir) => path.join(dir, "*")),
+          ...referenceDirs.map((dir) => path.join(dir, "*")),
+        ]
+        const readonlyExternalDirectory = {
+          "*": "ask",
+          ...Object.fromEntries(whitelistedDirs.map((dir) => [dir, "allow"])),
+        } satisfies Record<string, "allow" | "ask" | "deny">
+
+        const defaults = Permission.fromConfig({
+          "*": "allow",
+          doom_loop: "ask",
+          external_directory: {
+            "*": "ask",
+            ...Object.fromEntries(whitelistedDirs.map((dir) => [dir, "allow"])),
+          },
+          question: "deny",
+          plan_enter: "deny",
+          plan_exit: "deny",
+          // mirrors github.com/github/gitignore Node.gitignore pattern for .env files
+          read: {
+            "*": "allow",
+            "*.env": "ask",
+            "*.env.*": "ask",
+            "*.env.example": "allow",
+          },
+        })
+
+        const user = Permission.fromConfig(cfg.permission ?? {})
+
+        const agents: Record<string, Info> = {
+          operator: {
+            name: "operator",
+            description:
+              "Boros root orchestrator — runs the offensive kill chain to a verified compromise by delegating to specialist operators.",
+            options: {},
+            prompt: BOROS_ROOT + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                plan_enter: "allow",
+              }),
+              user,
+            ),
+            mode: "primary",
+            native: true,
+          },
+          plan: {
+            name: "plan",
+            description:
+              "Planning operator — before any exploitation, maps the operation: recon targets, attack-surface leads, exploit path, privilege-escalation chain, and a step-by-step todo list to a verified compromise. Produces a written offensive plan, never executes the attack.",
+            prompt: BOROS_PLAN + "\n\n" + BOROS_DOCTRINE,
+            options: {},
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                plan_exit: "allow",
+                task: {
+                  general: "deny",
+                },
+                external_directory: {
+                  [path.join(Global.Path.data, "plans", "*")]: "allow",
+                },
+                edit: {
+                  "*": "deny",
+                  [path.join(".boros", "plans", "*.md")]: "allow",
+                  [path.relative(ctx.worktree, path.join(Global.Path.data, path.join("plans", "*.md")))]: "allow",
+                },
+              }),
+              user,
+            ),
+            mode: "primary",
+            native: true,
+          },
+          general: {
+            name: "general",
+            description: `General-purpose offensive operator — researches attack vectors, technique write-ups, and CVE context, and executes multi-step offensive tasks (credential hunting, config/artifact analysis, leak hunting, enumeration support) in parallel. Use this agent to run independent units of offensive work concurrently.`,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                todowrite: "deny",
+              }),
+              user,
+            ),
+            options: {},
+            mode: "subagent",
+            native: true,
+          },
+          explore: {
+            name: "explore",
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                "*": "deny",
+                grep: "allow",
+                glob: "allow",
+                list: "allow",
+                bash: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                read: "allow",
+                external_directory: readonlyExternalDirectory,
+              }),
+              user,
+            ),
+            description: `Fast reconnaissance operator specialized for digging through a target's exposed surface: dumped source, configs, logs, env files, backups, and seized artifacts. Use when you need to quickly find files by patterns (eg. "**/*.env", "**/config*.json"), grep for high-value tokens (API keys, passwords, JWTs, AWS keys, connection strings, leaked secrets), inventory the stack (package manifests, lockfiles, dependency versions), or answer questions about how a target's systems are wired (eg. "where are the admin creds stored?"). When calling this agent, specify the desired thoroughness level: "quick" for basic searches, "medium" for moderate scanning, or "very thorough" for comprehensive digging across multiple locations and naming conventions.`,
+            prompt: PROMPT_EXPLORE,
+            options: {},
+            mode: "subagent",
+            native: true,
+          },
+          compaction: {
+            name: "compaction",
+            mode: "primary",
+            native: true,
+            hidden: true,
+            prompt: PROMPT_COMPACTION,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                "*": "deny",
+              }),
+              user,
+            ),
+            options: {},
+          },
+          title: {
+            name: "title",
+            mode: "primary",
+            options: {},
+            native: true,
+            hidden: true,
+            temperature: 0.5,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                "*": "deny",
+              }),
+              user,
+            ),
+            prompt: PROMPT_TITLE,
+          },
+          summary: {
+            name: "summary",
+            mode: "primary",
+            options: {},
+            native: true,
+            hidden: true,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                "*": "deny",
+              }),
+              user,
+            ),
+            prompt: PROMPT_SUMMARY,
+          },
+          recon: {
+            name: "recon",
+            description:
+              "Reconnaissance operator — maps the attack surface and produces ranked exploitable leads with versions + vulnerability hypotheses.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "secondary",
+            prompt: BOROS_RECON + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          exploit: {
+            name: "exploit",
+            description:
+              "Exploitation operator — turns weaknesses into real access (shells, flags, accounts) with evidence.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "error",
+            prompt: BOROS_EXPLOIT + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          "exploit-engineer": {
+            name: "exploit-engineer",
+            description:
+              "Exploit Engineer operator — reverse-engineering + exploit development: patch-diffing, fuzzing, sanitizer-confirmed PoCs, deterministic exploit code (memory corruption, logic flaws, injection) to real code execution.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "error",
+            prompt: BOROS_EXPLOIT_ENGINEER + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          privesc: {
+            name: "privesc",
+            description:
+              "Privilege escalation operator — drives a foothold to root/SYSTEM/Domain Admin and proves it.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "warning",
+            prompt: BOROS_PRIVESC + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          web: {
+            name: "web",
+            description:
+              "Web exploitation operator — breaks web apps/APIs (RCE/SQLi/SSRF/XSS/auth-bypass) with request/response evidence.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "info",
+            prompt: BOROS_WEB + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          triage: {
+            name: "triage",
+            description:
+              "Triage operator — classifies the objective by attacker intent and routes to the right specialist.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "accent",
+            prompt: BOROS_TRIAGE + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                "*": "deny",
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                read: {
+                  "*": "allow",
+                  "*.env": "ask",
+                  "*.env.*": "ask",
+                },
+              }),
+              user,
+            ),
+          },
+          assistant: {
+            name: "assistant",
+            description:
+              "Assistant operator — tooling/payload dev, credential/foothold management, coordination, reporting.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "success",
+            prompt: BOROS_ASSISTANT + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          crypto: {
+            name: "crypto",
+            description:
+              "Cryptography operator — attacks the crypto layer: TLS/key exchange, cipher modes, tokens/signatures, hashes/brute-forcing, nonce/IV misuse — from oracle attacks (padding, Bleichenbacher, Raccoon-class timing) to offline property breaks.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "secondary",
+            prompt: BOROS_CRYPTO + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          llm: {
+            name: "llm",
+            description:
+              "AI/LLM red team operator — prompt injection, jailbreaking, RAG/system-leak, tool/MCP abuse, agent confused-deputy, model attacks on LLM apps.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "info",
+            prompt: BOROS_LLM + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          post: {
+            name: "post",
+            description:
+              "Post-Exploitation operator — credential access, persistence, lateral movement, pivoting/tunneling, C2 flow, evasion, cleanup after a foothold.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "warning",
+            prompt: BOROS_POST + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+              }),
+              user,
+            ),
+          },
+          harness: {
+            name: "harness",
+            description:
+              "Harness Engineer operator — builds reusable attack machinery: intercepting proxies, target drivers, fuzz harnesses, exploit scaffolds, oracle loops, payload factories.",
+            mode: "subagent",
+            options: {},
+            native: true,
+            color: "success",
+            prompt: BOROS_HARNESS + "\n\n" + BOROS_DOCTRINE,
+            permission: Permission.merge(
+              defaults,
+              Permission.fromConfig({
+                question: "allow",
+                todowrite: "allow",
+                skill: "allow",
+                webfetch: "allow",
+                websearch: "allow",
+                bash: "allow",
+                edit: "allow",
+                write: "allow",
+              }),
+              user,
+            ),
+          },
+        }
+
+        for (const [key, value] of Object.entries(cfg.agent ?? {})) {
+          if (value.disable) {
+            delete agents[key]
+            continue
+          }
+          let item = agents[key]
+          if (!item)
+            item = agents[key] = {
+              name: key,
+              mode: "all",
+              permission: Permission.merge(defaults, user),
+              options: {},
+              native: false,
+            }
+          if (value.model) item.model = Provider.parseModel(value.model)
+          item.variant = value.variant ?? item.variant
+          item.prompt = value.prompt ?? item.prompt
+          item.description = value.description ?? item.description
+          item.temperature = value.temperature ?? item.temperature
+          item.topP = value.top_p ?? item.topP
+          item.mode = value.mode ?? item.mode
+          item.color = value.color ?? item.color
+          item.hidden = value.hidden ?? item.hidden
+          item.name = value.name ?? item.name
+          item.steps = value.steps ?? item.steps
+          item.options = mergeDeep(item.options, value.options ?? {})
+          item.permission = Permission.merge(item.permission, Permission.fromConfig(value.permission ?? {}))
+        }
+
+        // Ensure Truncate.GLOB is allowed unless explicitly configured
+        for (const name in agents) {
+          const agent = agents[name]
+          const explicit = agent.permission.some((r) => {
+            if (r.permission !== "external_directory") return false
+            if (r.action !== "deny") return false
+            return r.pattern === Truncate.GLOB
+          })
+          if (explicit) continue
+
+          agents[name].permission = Permission.merge(
+            agents[name].permission,
+            Permission.fromConfig({ external_directory: { [Truncate.GLOB]: "allow" } }),
+          )
+        }
+
+        const get = Effect.fnUntraced(function* (agent: string) {
+          return agents[agent]
+        })
+
+        const list = Effect.fnUntraced(function* () {
+          const cfg = yield* config.get()
+          // "build" is the pre-fork name of the default agent; sort aliases the same.
+          const defaultName = cfg.default_agent === "build" ? "operator" : cfg.default_agent
+          return pipe(
+            agents,
+            values(),
+            sortBy(
+              [(x) => (defaultName ? x.name === defaultName : x.name === "operator"), "desc"],
+              [(x) => x.name, "asc"],
+            ),
+          )
+        })
+
+        const defaultInfo = Effect.fnUntraced(function* () {
+          const c = yield* config.get()
+          if (c.default_agent) {
+            // Compatibility: the default agent was renamed "build" -> "operator";
+            // existing configs may still set the legacy name.
+            const name = c.default_agent === "build" ? "operator" : c.default_agent
+            const agent = agents[name]
+            if (!agent) throw new Error(`default agent "${c.default_agent}" not found`)
+            if (agent.mode === "subagent") throw new Error(`default agent "${c.default_agent}" is a subagent`)
+            if (agent.hidden === true) throw new Error(`default agent "${c.default_agent}" is hidden`)
+            return agent
+          }
+          const visible = Object.values(agents).find((a) => a.mode !== "subagent" && a.hidden !== true)
+          if (!visible) throw new Error("no primary visible agent found")
+          return visible
+        })
+
+        const defaultAgent = Effect.fnUntraced(function* () {
+          return (yield* defaultInfo()).name
+        })
+
+        return {
+          get,
+          list,
+          defaultInfo,
+          defaultAgent,
+        } satisfies State
+      }),
+    )
+
+    return Service.of({
+      get: Effect.fn("Agent.get")(function* (agent: string) {
+        return yield* InstanceState.useEffect(state, (s) => s.get(agent))
+      }),
+      list: Effect.fn("Agent.list")(function* () {
+        return yield* InstanceState.useEffect(state, (s) => s.list())
+      }),
+      defaultInfo: Effect.fn("Agent.defaultInfo")(function* () {
+        return yield* InstanceState.useEffect(state, (s) => s.defaultInfo())
+      }),
+      defaultAgent: Effect.fn("Agent.defaultAgent")(function* () {
+        return yield* InstanceState.useEffect(state, (s) => s.defaultAgent())
+      }),
+      generate: Effect.fn("Agent.generate")(function* (input: {
+        description: string
+        model?: { providerID: ProviderV2.ID; modelID: ModelV2.ID }
+      }) {
+        const cfg = yield* config.get()
+        const model = input.model ?? (yield* provider.defaultModel())
+        const resolved = yield* provider.getModel(model.providerID, model.modelID)
+        const language = yield* provider.getLanguage(resolved)
+        const tracer = cfg.experimental?.openTelemetry
+          ? Option.getOrUndefined(yield* Effect.serviceOption(OtelTracer.OtelTracer))
+          : undefined
+
+        const system = [PROMPT_GENERATE]
+        yield* plugin.trigger("experimental.chat.system.transform", { model: resolved }, { system })
+        const existing = yield* InstanceState.useEffect(state, (s) => s.list())
+
+        // TODO: clean this up so provider specific logic doesnt bleed over
+        const authInfo = yield* auth.get(model.providerID).pipe(Effect.orDie)
+        const isOpenaiOauth = model.providerID === "openai" && authInfo?.type === "oauth"
+
+        const params = {
+          experimental_telemetry: {
+            isEnabled: cfg.experimental?.openTelemetry,
+            tracer,
+            metadata: {
+              userId: cfg.username ?? "unknown",
+            },
+          },
+          temperature: 0.3,
+          messages: [
+            ...(isOpenaiOauth
+              ? []
+              : system.map(
+                  (item): ModelMessage => ({
+                    role: "system",
+                    content: item,
+                  }),
+                )),
+            {
+              role: "user",
+              content: `Create an agent configuration based on this request: "${input.description}".\n\nIMPORTANT: The following identifiers already exist and must NOT be used: ${existing.map((i) => i.name).join(", ")}\n  Return ONLY the JSON object, no other text, do not wrap in backticks`,
+            },
+          ],
+          model: language,
+          schema: Object.assign(
+            Schema.toStandardSchemaV1(GeneratedAgent),
+            Schema.toStandardJSONSchemaV1(GeneratedAgent),
+          ),
+        } satisfies Parameters<typeof generateObject>[0]
+
+        if (isOpenaiOauth) {
+          return yield* Effect.promise(async () => {
+            const result = streamObject({
+              ...params,
+              providerOptions: ProviderTransform.providerOptions(resolved, {
+                instructions: system.join("\n"),
+                store: false,
+              }),
+              onError: () => {},
+            })
+            for await (const part of result.fullStream) {
+              if (part.type === "error") throw part.error
+            }
+            return result.object
+          })
+        }
+
+        return yield* Effect.promise(() => generateObject(params).then((r) => r.object))
+      }),
+    })
+  }),
+)
+
+const locationServiceMapNode = LayerNode.make({
+  service: LocationServiceMap.Service,
+  layer: locationServiceMapLayer,
+  deps: [],
+})
+
+export const node = LayerNode.make({
+  service: Service,
+  layer: layer,
+  deps: [Config.node, Auth.node, Plugin.node, Skill.node, Provider.node, locationServiceMapNode],
+})
+
+export * as Agent from "./agent"

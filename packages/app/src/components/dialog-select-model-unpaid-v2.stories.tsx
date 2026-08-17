@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { Button } from "@opencode-ai/ui/button"
-import { useDialog } from "@opencode-ai/ui/context/dialog"
+import { Button } from "@boros-ai/ui/button"
+import { useDialog } from "@boros-ai/ui/context/dialog"
 import { createSignal, onMount } from "solid-js"
 import { DialogSelectModelUnpaidV2 } from "./dialog-select-model-unpaid-v2"
 

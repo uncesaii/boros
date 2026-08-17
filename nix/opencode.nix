@@ -52,7 +52,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
-    cd ./packages/opencode
+    cd ./packages/boros
     bun --bun ./script/build.ts --single --skip-install
     bun --bun ./script/schema.ts schema.json
 
@@ -62,7 +62,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   installPhase = ''
     runHook preInstall
 
-    install -Dm755 dist/opencode-*/bin/opencode $out/bin/opencode
+    install -Dm755 dist/boros-*/bin/boros $out/bin/opencode
     install -Dm644 schema.json $out/share/opencode/schema.json
 
     wrapProgram $out/bin/opencode \

@@ -55,12 +55,12 @@ jobs:
           BOROS_CHANNEL: latest
         run: |
           # NOTE: deliberately NOT setting BOROS_RELEASE so build.ts skips gh release upload
-          bun run --cwd packages/opencode script/build.ts
+          bun run --cwd packages/boros script/build.ts
       - name: Publish platform binary packages
         run: |
           set -e
           VERSION="${{ steps.version.outputs.version }}"
-          for pkgjson in packages/opencode/dist/*/package.json; do
+          for pkgjson in packages/boros/dist/*/package.json; do
             [ -f "$pkgjson" ] || continue
             dir=$(dirname "$pkgjson")
             name=$(node -p "require('./$pkgjson').name")
@@ -92,8 +92,8 @@ jobs:
             const pkg=JSON.parse(fs.readFileSync('npm/package.json','utf8'));
             pkg.version=process.argv[1];
             const deps={};
-            for (const p of fs.readdirSync('packages/opencode/dist')){
-              const pj='packages/opencode/dist/'+p+'/package.json';
+            for (const p of fs.readdirSync('packages/boros/dist')){
+              const pj='packages/boros/dist/'+p+'/package.json';
               if(!fs.existsSync(pj)) continue;
               const j=JSON.parse(fs.readFileSync(pj,'utf8'));
               if(/^boros-/.test(j.name)) deps[j.name]=pkg.version;
