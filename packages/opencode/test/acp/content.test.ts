@@ -81,24 +81,6 @@ describe("acp content conversion", () => {
     ])
   })
 
-  test("resource_link zed path becomes a file URL part", () => {
-    expect(
-      contentBlockToParts({
-        type: "resource_link",
-        uri: "zed://workspace?path=/tmp/project/src/app.ts",
-        name: "app.ts",
-        mimeType: "text/typescript",
-      }),
-    ).toEqual([
-      {
-        type: "file",
-        url: pathToFileURL("/tmp/project/src/app.ts").href,
-        filename: "app.ts",
-        mime: "text/typescript",
-      },
-    ])
-  })
-
   test("resource with text becomes a sourced text part", () => {
     const result = contentBlockToParts({
       type: "resource",

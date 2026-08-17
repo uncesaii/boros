@@ -15,14 +15,11 @@ import textmate from "../assets/icons/app/textmate.png"
 import vscode from "../assets/icons/app/vscode.svg"
 import warp from "../assets/icons/app/warp.png"
 import xcode from "../assets/icons/app/xcode.png"
-import zed from "../assets/icons/app/zed.svg"
-import zedDark from "../assets/icons/app/zed-dark.svg"
 import sublimetext from "../assets/icons/app/sublimetext.svg"
 
 const icons = {
   vscode,
   cursor,
-  zed,
   "file-explorer": fileExplorer,
   finder,
   terminal,
@@ -37,12 +34,7 @@ const icons = {
   "sublime-text": sublimetext,
 } satisfies Record<IconName, string>
 
-const themed: Partial<Record<IconName, { light: string; dark: string }>> = {
-  zed: {
-    light: zed,
-    dark: zedDark,
-  },
-}
+const themed: Partial<Record<IconName, { light: string; dark: string }>> = {}
 
 const scheme = () => {
   if (typeof document !== "object") return "light" as const

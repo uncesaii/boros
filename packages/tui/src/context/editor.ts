@@ -1,7 +1,6 @@
 import { onCleanup, onMount } from "solid-js"
 import { createStore } from "solid-js/store"
 import { Option, Schema, SchemaGetter } from "effect"
-import { isRecord } from "../util/record"
 import { useTuiPaths } from "./runtime"
 import { createSimpleContext } from "./helper"
 import { editorIntegration } from "../editor"
@@ -36,7 +35,7 @@ const EditorSelectionRangeSchema = Schema.Struct({
 
 const EditorSelectionRangesSchema = Schema.Struct({
   filePath: Schema.String,
-  source: Schema.optional(Schema.Literals(["websocket", "zed"])),
+  source: Schema.optional(Schema.Literals(["websocket"])),
   ranges: Schema.mutable(Schema.Array(EditorSelectionRangeSchema).check(Schema.isMinLength(1))),
 })
 
@@ -45,7 +44,7 @@ const EditorSelectionSchema = Schema.Union([
   Schema.Struct({
     text: Schema.String,
     filePath: Schema.String,
-    source: Schema.optional(Schema.Literals(["websocket", "zed"])),
+    source: Schema.optional(Schema.Literals(["websocket"])),
     selection: Schema.Struct({
       start: PositionSchema,
       end: PositionSchema,
@@ -118,7 +117,6 @@ export const { use: useEditorContext, provider: EditorContextProvider } = create
     const parsedPort = value ? Number.parseInt(value, 10) : undefined
     const port =
       parsedPort && Number.isInteger(parsedPort) && parsedPort > 0 && parsedPort <= 65535 ? parsedPort : undefined
-    const zedTerminal = process.env.ZED_TERM === "true" || process.env.TERM_PROGRAM?.toLowerCase() === "zed"
     const mentionListeners = new Set<(mention: EditorMention) => void>()
     const WebSocketImpl = props.WebSocketImpl ?? WebSocket
     const [store, setStore] = createStore<{
@@ -138,8 +136,6 @@ export const { use: useEditorContext, provider: EditorContextProvider } = create
     let reconnect: ReturnType<typeof setTimeout> | undefined
     let attempt = 0
     let requestID = 0
-    let zedSelection: Promise<void> | undefined
-    let lastZedSelectionKey: string | undefined
     let directory = paths.cwd
     let preserveSelectionOnReconnect = false
     const pending = new Map<number, string>()
@@ -150,12 +146,11 @@ export const { use: useEditorContext, provider: EditorContextProvider } = create
       if (changed) setStore("selectionSent", false)
     }
 
-    const clearSelectionForReconnect = (options?: { resetZedSelectionKey?: boolean }) => {
+    const clearSelectionForReconnect = () => {
       if (preserveSelectionOnReconnect) {
         preserveSelectionOnReconnect = false
         return
       }
-      if (options?.resetZedSelectionKey) lastZedSelectionKey = undefined
       setSelection(undefined)
     }
 
@@ -175,38 +170,8 @@ export const { use: useEditorContext, provider: EditorContextProvider } = create
 
       const connection = resolveEditorConnection(directory, port, editor.connection)
       if (!connection) {
-        if (!zedTerminal) {
-          setStore("status", "disabled")
-          scheduleReconnect()
-          return
-        }
-        if (!editor.selection) {
-          setStore("status", "disabled")
-          scheduleReconnect()
-          return
-        }
-
-        zedSelection ??= editor
-          .selection(directory)
-          .then((result) => {
-            if (closed || socket) return
-            if (!isRecord(result) || result.type === "unavailable") return
-            const decoded = result.type === "selection" ? decodeEditorSelection(result.selection) : Option.none()
-            const selection = Option.getOrUndefined(decoded)
-            const key = editorSelectionKey(selection)
-            if (key !== lastZedSelectionKey) {
-              lastZedSelectionKey = key
-              setSelection(selection)
-              setStore("status", selection ? "connected" : "disabled")
-            }
-          })
-          .catch(() => {
-            // Keep the last known Zed selection for transient polling failures.
-          })
-          .finally(() => {
-            zedSelection = undefined
-          })
-        scheduleZedPoll()
+        setStore("status", "disabled")
+        scheduleReconnect()
         return
       }
 
@@ -281,16 +246,10 @@ export const { use: useEditorContext, provider: EditorContextProvider } = create
       reconnect = setTimeout(connect, delay)
     }
 
-    const scheduleZedPoll = () => {
-      if (closed) return
-      if (reconnect) clearTimeout(reconnect)
-      reconnect = setTimeout(connect, 1000)
-    }
-
     const reconnectWithDirectory = (nextDirectory?: string) => {
       const resolved = nextDirectory || paths.cwd
       const sameDirectory = directory === resolved
-      clearSelectionForReconnect({ resetZedSelectionKey: !sameDirectory })
+      clearSelectionForReconnect()
       if (sameDirectory) return
 
       directory = resolved
@@ -320,7 +279,7 @@ export const { use: useEditorContext, provider: EditorContextProvider } = create
 
     return {
       enabled() {
-        return Boolean(resolveEditorConnection(directory, port, editor.connection) || (zedTerminal && editor.selection))
+        return Boolean(resolveEditorConnection(directory, port, editor.connection))
       },
       connected() {
         return store.status === "connected"
@@ -329,8 +288,6 @@ export const { use: useEditorContext, provider: EditorContextProvider } = create
         return store.selection
       },
       clearSelection() {
-        lastZedSelectionKey = undefined
-        zedSelection = undefined
         setSelection(undefined)
       },
       preserveSelectionFromNewSession() {

@@ -121,10 +121,13 @@ export const ModelsDevPlugin = define({
   effect: Effect.fn(function* (ctx) {
     const modelsDev = yield* ModelsDev.Service
     const events = yield* EventV2.Service
+    const allowed = (item: ModelsDev.Provider) =>
+      item.id !== "opencode" && item.id !== "opencode-go"
     yield* ctx.integration.transform(
       Effect.fn(function* (integrations) {
         const data = yield* modelsDev.get()
         for (const item of Object.values(data)) {
+          if (!allowed(item)) continue
           if (item.env.length === 0) continue
           const integrationID = item.id
           integrations.update(integrationID, (integration) => (integration.name = item.name))
@@ -143,6 +146,7 @@ export const ModelsDevPlugin = define({
       Effect.fn(function* (catalog) {
         const data = yield* modelsDev.get()
         for (const item of Object.values(data)) {
+          if (!allowed(item)) continue
           const providerID = ProviderV2.ID.make(item.id)
           catalog.provider.update(providerID, (provider) => {
             provider.name = item.name
@@ -160,6 +164,7 @@ export const ModelsDevPlugin = define({
           })
 
           for (const model of Object.values(item.models)) {
+            if (model.id.endsWith("-free")) continue
             const baseCost = cost(model.cost)
             catalog.model.update(providerID, model.id, (draft) => applyModel(draft, model, { cost: baseCost }))
             for (const [mode, options] of Object.entries(model.experimental?.modes ?? {})) {

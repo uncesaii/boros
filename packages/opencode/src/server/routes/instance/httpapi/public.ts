@@ -1,5 +1,5 @@
 import { OpenApi } from "effect/unstable/httpapi"
-import { OpenCodeHttpApi } from "./api"
+import { BorosHttpApi } from "./api"
 import { QueryBooleanOpenApi } from "./groups/query"
 
 type OpenApiParameter = {
@@ -449,7 +449,7 @@ function fixSelfReferencingComponents(spec: OpenApiSpec) {
     }
   }
   // Simplest fix: generate the raw spec (without transform) to get correct schemas
-  const raw: OpenApiSpec = OpenApi.fromApi(OpenCodeHttpApi)
+  const raw: OpenApiSpec = OpenApi.fromApi(BorosHttpApi)
   const rawSchemas = raw.components?.schemas
   if (!rawSchemas) return
   for (const name of selfRefs) {
@@ -527,11 +527,11 @@ function normalizeParameter(param: OpenApiParameter, route: string) {
   param.schema = stripOptionalNull(param.schema)
 }
 
-export const PublicApi = OpenCodeHttpApi.annotateMerge(
+export const PublicApi = BorosHttpApi.annotateMerge(
   OpenApi.annotations({
-    title: "opencode",
+    title: "Boros",
     version: "1.0.0",
-    description: "opencode api",
+    description: "Boros api",
     transform: matchLegacyOpenApi,
   }),
 )

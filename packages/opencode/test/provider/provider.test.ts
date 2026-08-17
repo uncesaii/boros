@@ -1191,12 +1191,12 @@ it.instance("ModelNotFoundError for provider includes suggestions", () =>
 
 it.instance("ModelNotFoundError suggests catalog models for unloaded providers", () =>
   Effect.gen(function* () {
-    yield* remove("OPENCODE_API_KEY")
+    yield* remove("OPENAI_API_KEY")
     const error = yield* Provider.use
-      .getModel(ProviderV2.ID.opencode, ModelV2.ID.make("claude-haiku-fake-model"))
+      .getModel(ProviderV2.ID.openai, ModelV2.ID.make("gpt-5-nano-fake-model"))
       .pipe(Effect.flip)
     if (!Provider.ModelNotFoundError.isInstance(error)) throw error
-    expect(error.suggestions ?? []).toContain("claude-haiku-4-5")
+    expect(error.suggestions ?? []).toContain("gpt-5-nano")
   }),
 )
 
