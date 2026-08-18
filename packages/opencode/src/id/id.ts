@@ -57,7 +57,11 @@ export function create(prefix: string, direction: "descending" | "ascending", ti
   }
   counter++
 
-  let now = BigInt(currentTimestamp) * BigInt(0x1000) + BigInt(counter)
+  // The time field is 48 bits (6 bytes). We pack `timestamp_ms * 0x80 + counter`
+  // into it, giving the timestamp 41 bits (valid until ~2039) and the counter 7
+  // bits (max 127 IDs per millisecond). A larger multiplier (e.g. 0x1000) would
+  // overflow the 48-bit field for 2026+ timestamps and wrap, breaking ordering.
+  let now = BigInt(currentTimestamp) * BigInt(0x80) + BigInt(counter)
 
   now = direction === "descending" ? ~now : now
 
@@ -74,7 +78,7 @@ export function timestamp(id: string): number {
   const prefix = id.split("_")[0]
   const hex = id.slice(prefix.length + 1, prefix.length + 13)
   const encoded = BigInt("0x" + hex)
-  return Number(encoded / BigInt(0x1000))
+  return Number(encoded / BigInt(0x80))
 }
 
 export * as Identifier from "./id"
