@@ -1,6 +1,6 @@
 import { LayerNode } from "@opencode-ai/core/effect/layer-node"
 import { NodePath } from "@effect/platform-node"
-import { Cause, Duration, Effect, Layer, Option, Schedule, Context } from "effect"
+import { Cause, Clock, Duration, Effect, Layer, Option, Schedule, Context } from "effect"
 import path from "path"
 import type { Agent } from "../agent/agent"
 import { FSUtil } from "@opencode-ai/core/fs-util"
@@ -52,15 +52,27 @@ const layer = Layer.effect(
     const fs = yield* FSUtil.Service
 
     const cleanup = Effect.fn("Truncate.cleanup")(function* () {
-      const cutoff = Identifier.timestamp(
-        Identifier.create("tool", "ascending", Date.now() - Duration.toMillis(RETENTION)),
-      )
       const entries = yield* fs.readDirectory(TRUNCATION_DIR).pipe(
         Effect.map((all) => all.filter((name) => name.startsWith("tool_"))),
         Effect.catch(() => Effect.succeed([])),
       )
+      // Snapshot the clock after the directory read so a file written during the
+      // read is never misclassified as future-dated and deleted.
+      const now = yield* Clock.currentTimeMillis
+      const cutoff = Identifier.timestamp(
+        Identifier.create("tool", "ascending", now - Duration.toMillis(RETENTION)),
+      )
       for (const entry of entries) {
-        if (Identifier.timestamp(entry) >= cutoff) continue
+        // A malformed tool_ entry would throw here; treat it as out-of-window so
+        // it is removed rather than aborting the whole cleanup pass.
+        const ts = yield* Effect.try({
+          try: () => Identifier.timestamp(entry),
+          catch: () => new Error(`malformed truncation id: ${entry}`),
+        }).pipe(Effect.catch(() => Effect.succeed(Number.POSITIVE_INFINITY)))
+        // Keep only files whose timestamp falls within the retention window.
+        // A file dated in the future is invalid — a legacy ID written with the
+        // old 0x1000 layout decodes to an out-of-range value — so drop it too.
+        if (ts >= cutoff && ts <= now) continue
         yield* fs.remove(path.join(TRUNCATION_DIR, entry)).pipe(Effect.catch(() => Effect.void))
       }
     })
