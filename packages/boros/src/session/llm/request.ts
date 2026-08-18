@@ -32,7 +32,6 @@ type PrepareInput = {
   readonly auth: Auth.Info | undefined
   readonly plugin: Plugin.Interface
   readonly flags: RuntimeFlags.Info
-  readonly isWorkflow: boolean
 }
 
 export type Prepared = {
@@ -99,7 +98,7 @@ export const prepare = Effect.fn("LLMRequestPrep.prepare")(function* (input: Pre
   if (isOpenaiOauth) options.instructions = system.join("\n")
 
   const messages =
-    isOpenaiOauth || input.isWorkflow
+    isOpenaiOauth
       ? input.messages
       : [
           ...system.map(

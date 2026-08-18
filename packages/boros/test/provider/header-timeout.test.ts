@@ -136,41 +136,6 @@ it.live("headerTimeout is opt-in for non-OpenAI providers", () =>
   }),
 )
 
-it.live("OpenAI Codex headerTimeout default can be disabled by config", () =>
-  Effect.gen(function* () {
-    yield* withAuthContent(
-      Effect.gen(function* () {
-        yield* provideTmpdirInstance(
-          () =>
-            Effect.gen(function* () {
-              const provider = yield* Provider.Service
-              const openai = yield* provider.getProvider(ProviderV2.ID.openai)
-              expect(openai.options.headerTimeout).toBe(false)
-            }),
-          { config: { provider: { openai: { options: { headerTimeout: false } } } } },
-        )
-      }),
-    )
-  }),
-)
-
-it.live("OpenAI API auth gets default headerTimeout", () =>
-  Effect.gen(function* () {
-    yield* withAuthContent(
-      Effect.gen(function* () {
-        yield* provideTmpdirInstance(() =>
-          Effect.gen(function* () {
-            const provider = yield* Provider.Service
-            const openai = yield* provider.getProvider(ProviderV2.ID.openai)
-            expect(openai.options.headerTimeout).toBe(300_000)
-          }),
-        )
-      }),
-      { openai: { type: "api", key: "sk-test" } },
-    )
-  }),
-)
-
 function providerConfig(url: string, options: Record<string, unknown> = {}) {
   const config = testProviderConfig(url)
   return {
@@ -209,26 +174,4 @@ async function delayedBodyServer(delay: number): Promise<{ server: Server; url: 
   const address = server.address()
   if (!address || typeof address === "string") throw new Error("server did not bind to a TCP port")
   return { server, url: `http://127.0.0.1:${address.port}` }
-}
-
-function withAuthContent<A, E, R>(self: Effect.Effect<A, E, R>, value: Record<string, unknown> = defaultAuthContent()) {
-  return Effect.acquireUseRelease(
-    Effect.sync(() => {
-      const previous = process.env.OPENCODE_AUTH_CONTENT
-      process.env.OPENCODE_AUTH_CONTENT = JSON.stringify(value)
-      return previous
-    }),
-    () => self,
-    (previous) =>
-      Effect.sync(() => {
-        if (previous === undefined) delete process.env.OPENCODE_AUTH_CONTENT
-        else process.env.OPENCODE_AUTH_CONTENT = previous
-      }),
-  )
-}
-
-function defaultAuthContent() {
-  return {
-    openai: { type: "oauth", refresh: "refresh", access: "access", expires: Date.now() + 60_000 },
-  }
 }

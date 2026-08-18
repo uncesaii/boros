@@ -577,7 +577,6 @@ describe("ProviderTransform.options - gpt-5 textVerbosity", () => {
           init: () => Effect.void,
         } as any,
         flags: { outputTokenMax: 32_000, client: "test" } as any,
-        isWorkflow: false,
       }),
     )
     expect(result.params.options.reasoningEffort).toBe("high")

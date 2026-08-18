@@ -121,8 +121,11 @@ export const ModelsDevPlugin = define({
   effect: Effect.fn(function* (ctx) {
     const modelsDev = yield* ModelsDev.Service
     const events = yield* EventV2.Service
-    const allowed = (item: ModelsDev.Provider) =>
-      item.id !== "opencode" && item.id !== "opencode-go"
+    // Only Ollama Cloud is admitted from the remote catalog. Local Ollama and
+    // custom OpenAI-compatible endpoints are registered by their own plugins;
+    // any other provider can still be added manually through the dynamic
+    // provider in the TUI.
+    const allowed = (item: ModelsDev.Provider) => item.id === "ollama-cloud"
     yield* ctx.integration.transform(
       Effect.fn(function* (integrations) {
         const data = yield* modelsDev.get()

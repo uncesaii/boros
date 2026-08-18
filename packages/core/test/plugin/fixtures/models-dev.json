@@ -1,8 +1,8 @@
 {
-  "acme": {
-    "id": "acme",
-    "name": "Acme",
-    "env": ["ACME_API_KEY"],
+  "ollama-cloud": {
+    "id": "ollama-cloud",
+    "name": "Ollama Cloud",
+    "env": ["OLLAMA_API_KEY"],
     "models": {}
   },
   "local": {
