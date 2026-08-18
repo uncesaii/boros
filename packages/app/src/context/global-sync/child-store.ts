@@ -20,6 +20,9 @@ import { directoryKey, type DirectoryKey } from "./utils"
 import { NormalizedProviderListResponse } from "@opencode-ai/session-ui/context"
 import type { ServerScope } from "@/utils/server-scope"
 
+const EMPTY_MCP_STATUSES: State["mcp"] = {}
+const EMPTY_MCP_RESOURCES: State["mcp_resource"] = {}
+
 export function createChildStoreManager(input: {
   owner: Owner
   scope: ServerScope
@@ -241,10 +244,10 @@ export function createChildStoreManager(input: {
               return !mcpQuery.isLoading
             },
             get mcp() {
-              return mcpQuery.isLoading ? {} : (mcpQuery.data ?? {})
+              return mcpQuery.isLoading ? EMPTY_MCP_STATUSES : (mcpQuery.data ?? EMPTY_MCP_STATUSES)
             },
             get mcp_resource() {
-              return mcpResourceQuery.isLoading ? {} : (mcpResourceQuery.data ?? {})
+              return mcpResourceQuery.isLoading ? EMPTY_MCP_RESOURCES : (mcpResourceQuery.data ?? EMPTY_MCP_RESOURCES)
             },
             get lsp_ready() {
               return instanceQueriesEnabled() && !lspQuery.isLoading

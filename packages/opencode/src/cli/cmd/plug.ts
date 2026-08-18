@@ -77,7 +77,7 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
     install.start("Installing plugin package...")
     const target = await installPlugin(mod, dep)
     if (!target.ok) {
-      install.stop("Install failed", 1)
+      install.stop("Install failed")
       dep.log.error(`Could not install "${mod}"`)
       const hit = cause(target.error) ?? target.error
       if (hit instanceof Process.RunFailedError) {
@@ -106,14 +106,14 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
     const manifest = await readPluginManifest(target.target)
     if (!manifest.ok) {
       if (manifest.code === "manifest_read_failed") {
-        inspect.stop("Manifest read failed", 1)
+        inspect.stop("Manifest read failed")
         dep.log.error(`Installed "${mod}" but failed to read ${manifest.file}`)
         dep.log.error(errorMessage(cause(manifest.error) ?? manifest.error))
         return false
       }
 
       if (manifest.code === "manifest_no_targets") {
-        inspect.stop("No plugin targets found", 1)
+        inspect.stop("No plugin targets found")
         dep.log.error(`"${mod}" does not expose plugin entrypoints in package.json`)
         dep.log.info(
           'Expected one of: exports["./tui"], exports["./server"], package.json main for server, or package.json["oc-themes"] for tui themes.',
@@ -121,7 +121,7 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
         return false
       }
 
-      inspect.stop("Manifest read failed", 1)
+      inspect.stop("Manifest read failed")
       return false
     }
 
@@ -146,13 +146,13 @@ export function createPlugTask(input: PlugInput, dep: PlugDeps = defaultPlugDeps
     )
     if (!out.ok) {
       if (out.code === "invalid_json") {
-        patch.stop(`Failed updating ${out.kind} config`, 1)
+        patch.stop(`Failed updating ${out.kind} config`)
         dep.log.error(`Invalid JSON in ${out.file} (${out.parse} at line ${out.line}, column ${out.col})`)
         dep.log.info("Fix the config file and run the command again.")
         return false
       }
 
-      patch.stop("Failed updating plugin config", 1)
+      patch.stop("Failed updating plugin config")
       dep.log.error(errorMessage(out.error))
       return false
     }

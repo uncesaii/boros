@@ -32,6 +32,6 @@ export const spinner = () => {
   const s = prompts.spinner()
   return {
     start: (msg: string) => Effect.sync(() => s.start(msg)),
-    stop: (msg: string, code?: number) => Effect.sync(() => s.stop(msg, code)),
+    stop: (msg: string) => Effect.sync(() => s.stop(msg)),
   }
 }

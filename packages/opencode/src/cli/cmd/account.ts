@@ -71,11 +71,11 @@ const loginEffect = Effect.fn("login")(function* (url: string) {
         yield* s.stop("Logged in as " + r.email)
         yield* Prompt.outro("Done")
       }),
-    PollExpired: () => s.stop("Device code expired", 1),
-    PollDenied: () => s.stop("Authorization denied", 1),
-    PollError: (r) => s.stop("Error: " + String(r.cause), 1),
-    PollPending: () => s.stop("Unexpected state", 1),
-    PollSlow: () => s.stop("Unexpected state", 1),
+    PollExpired: () => s.stop("Device code expired"),
+    PollDenied: () => s.stop("Authorization denied"),
+    PollError: (r) => s.stop("Error: " + String(r.cause)),
+    PollPending: () => s.stop("Unexpected state"),
+    PollSlow: () => s.stop("Unexpected state"),
   })
 })
 

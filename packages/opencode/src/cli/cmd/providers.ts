@@ -107,7 +107,7 @@ const handlePluginAuth = Effect.fn("Cli.providers.pluginAuth")(function* (
       yield* spinner.start("Waiting for authorization...")
       const result = yield* cliTry("Failed to authorize: ", () => authorize.callback())
       if (result.type === "failed") {
-        yield* spinner.stop("Failed to authorize", 1)
+        yield* spinner.stop("Failed to authorize")
       }
       if (result.type === "success") {
         const saveProvider = result.provider ?? provider
