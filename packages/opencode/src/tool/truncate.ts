@@ -52,15 +52,20 @@ const layer = Layer.effect(
     const fs = yield* FSUtil.Service
 
     const cleanup = Effect.fn("Truncate.cleanup")(function* () {
+      const now = Date.now()
       const cutoff = Identifier.timestamp(
-        Identifier.create("tool", "ascending", Date.now() - Duration.toMillis(RETENTION)),
+        Identifier.create("tool", "ascending", now - Duration.toMillis(RETENTION)),
       )
       const entries = yield* fs.readDirectory(TRUNCATION_DIR).pipe(
         Effect.map((all) => all.filter((name) => name.startsWith("tool_"))),
         Effect.catch(() => Effect.succeed([])),
       )
       for (const entry of entries) {
-        if (Identifier.timestamp(entry) >= cutoff) continue
+        const ts = Identifier.timestamp(entry)
+        // Keep only files whose timestamp falls within the retention window.
+        // A file dated in the future is invalid — a legacy ID written with the
+        // old 0x1000 layout decodes to an out-of-range value — so drop it too.
+        if (ts >= cutoff && ts <= now) continue
         yield* fs.remove(path.join(TRUNCATION_DIR, entry)).pipe(Effect.catch(() => Effect.void))
       }
     })
