@@ -15,6 +15,8 @@ describe("Identifier", () => {
     const a = Identifier.create("ses", "ascending", TS_2026)
     const b = Identifier.create("ses", "ascending", TS_2026 + 1000)
     expect(Identifier.timestamp(a)).toBeLessThan(Identifier.timestamp(b))
+    // The serialized IDs must order the same way, not just the decoded timestamps.
+    expect(a < b).toBe(true)
   })
 
   test("allows up to 127 IDs per millisecond", () => {
