@@ -23,15 +23,16 @@ export const OllamaPlugin = define({
     const baseUrl = (process.env.BOROS_OLLAMA_BASE_URL ?? DEFAULT_BASE_URL).replace(/\/$/, "")
     yield* ctx.catalog.transform(
       Effect.fn(function* (catalog) {
-        let tags: OllamaTag[]
-        try {
-          const res = yield* Effect.promise(() => fetch(`${baseUrl}/api/tags`, { signal: AbortSignal.timeout(2000) }))
-          if (!res.ok) return
-          const body = (yield* Effect.promise(() => res.json())) as { models?: OllamaTag[] }
-          tags = body.models ?? []
-        } catch {
-          return
-        }
+        const tags: OllamaTag[] = yield* Effect.promise(async () => {
+          try {
+            const res = await fetch(`${baseUrl}/api/tags`, { signal: AbortSignal.timeout(2000) })
+            if (!res.ok) return []
+            const body = (await res.json()) as { models?: OllamaTag[] }
+            return body.models ?? []
+          } catch {
+            return []
+          }
+        })
         if (tags.length === 0) return
         catalog.provider.update("ollama", (provider) => {
           provider.name = "Ollama"
