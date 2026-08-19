@@ -31,7 +31,7 @@ const CHANNEL = await (async () => {
 })()
 const IS_PREVIEW = CHANNEL !== "latest"
 
-const borosPkgPath = path.resolve(import.meta.dir, "../../opencode/package.json")
+const borosPkgPath = path.resolve(import.meta.dir, "../../boros/package.json")
 const BOROS_PKG = await Bun.file(borosPkgPath).json()
 const VERSION = await (async () => {
   if (env.BOROS_VERSION) return env.BOROS_VERSION

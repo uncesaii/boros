@@ -1,5 +1,5 @@
-import { createOpencodeClient } from "@opencode-ai/sdk/v2/client"
-import { OpenCode, type OpenCodeClient } from "@opencode-ai/client/promise"
+import { createOpencodeClient } from "@boros-ai/sdk/v2/client"
+import { OpenCode, type OpenCodeClient } from "@boros-ai/client/promise"
 import type { ServerConnection } from "@/context/server"
 import { decode64 } from "@/utils/base64"
 

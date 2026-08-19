@@ -42,7 +42,7 @@ jobs:
         env:
           BOROS_EXPERIMENTAL_DISABLE_FILEWATCHER: false
       - name: HttpApi exerciser gates
-        working-directory: packages/opencode
+        working-directory: packages/boros
         timeout-minutes: 5
         run: bun run test:httpapi
   build:
@@ -56,9 +56,9 @@ jobs:
       - name: Build native binary (linux x64 smoke)
         run: |
           BOROS_CHANNEL=latest BOROS_VERSION="1.0.0" \
-            bun run --cwd packages/opencode script/build.ts --single
+            bun run --cwd packages/boros script/build.ts --single
       - name: Smoke test binary
         run: |
-          BIN=$(ls packages/opencode/dist/boros-*/bin/boros 2>/dev/null | head -1)
+          BIN=$(ls packages/boros/dist/boros-*/bin/boros 2>/dev/null | head -1)
           echo "binary: $BIN"
           "$BIN" --version

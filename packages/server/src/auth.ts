@@ -17,7 +17,7 @@ export type Info = {
   readonly username: string
 }
 
-export class Config extends Context.Service<Config, Info>()("@opencode/ServerAuthConfig") {
+export class Config extends Context.Service<Config, Info>()("@boros/ServerAuthConfig") {
   static configLayer(input: Info) {
     return Layer.succeed(this, this.of(input))
   }

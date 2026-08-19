@@ -1,18 +1,18 @@
 import path from "path"
 import { describe, expect } from "bun:test"
 import { Effect, Layer } from "effect"
-import { Catalog } from "@opencode-ai/core/catalog"
-import { Integration } from "@opencode-ai/core/integration"
-import { AppNodeBuilder } from "@opencode-ai/core/effect/app-node-builder"
-import { LayerNode } from "@opencode-ai/core/effect/layer-node"
-import { EventV2 } from "@opencode-ai/core/event"
-import { Flag } from "@opencode-ai/core/flag/flag"
-import { Location } from "@opencode-ai/core/location"
-import { ModelV2 } from "@opencode-ai/core/model"
-import { ModelsDev } from "@opencode-ai/core/models-dev"
-import { ModelsDevPlugin } from "@opencode-ai/core/plugin/models-dev"
-import { ProviderV2 } from "@opencode-ai/core/provider"
-import { AbsolutePath } from "@opencode-ai/core/schema"
+import { Catalog } from "@boros-ai/core/catalog"
+import { Integration } from "@boros-ai/core/integration"
+import { AppNodeBuilder } from "@boros-ai/core/effect/app-node-builder"
+import { LayerNode } from "@boros-ai/core/effect/layer-node"
+import { EventV2 } from "@boros-ai/core/event"
+import { Flag } from "@boros-ai/core/flag/flag"
+import { Location } from "@boros-ai/core/location"
+import { ModelV2 } from "@boros-ai/core/model"
+import { ModelsDev } from "@boros-ai/core/models-dev"
+import { ModelsDevPlugin } from "@boros-ai/core/plugin/models-dev"
+import { ProviderV2 } from "@boros-ai/core/provider"
+import { AbsolutePath } from "@boros-ai/core/schema"
 import { location } from "../fixture/location"
 import { testEffect } from "../lib/effect"
 import { catalogHost, host, integrationHost } from "./host"
@@ -34,12 +34,12 @@ describe("ModelsDevPlugin", () => {
       const models = ModelsDev.Service.of({
         get: () =>
           Effect.succeed({
-            acme: {
-              id: "acme",
-              name: "Acme",
+            "ollama-cloud": {
+              id: "ollama-cloud",
+              name: "Ollama Cloud",
               env: [],
               npm: "@ai-sdk/openai-compatible",
-              api: "https://api.acme.test/v1",
+              api: "https://ollama.com/v1",
               models: {
                 "gpt-5.4": {
                   id: "gpt-5.4",
@@ -89,7 +89,7 @@ describe("ModelsDevPlugin", () => {
         }),
       ).pipe(Effect.provideService(ModelsDev.Service, models))
 
-      const providerID = ProviderV2.ID.make("acme")
+      const providerID = ProviderV2.ID.make("ollama-cloud")
       const base = yield* catalog.model.get(providerID, ModelV2.ID.make("gpt-5.4"))
       const fast = yield* catalog.model.get(providerID, ModelV2.ID.make("gpt-5.4-fast"))
 
@@ -97,7 +97,7 @@ describe("ModelsDevPlugin", () => {
       expect(base?.request.body).toEqual({})
       expect(fast).toMatchObject({
         id: "gpt-5.4-fast",
-        providerID: "acme",
+        providerID: "ollama-cloud",
         name: "GPT-5.4 Fast",
         api: { id: "gpt-5.4" },
         request: {
@@ -147,13 +147,13 @@ describe("ModelsDevPlugin", () => {
           )
           expect(yield* integrations.list()).toEqual([
             new Integration.Info({
-              id: Integration.ID.make("acme"),
-              name: "Acme",
+              id: Integration.ID.make("ollama-cloud"),
+              name: "Ollama Cloud",
               methods: [
                 { type: "key" },
                 {
                   type: "env",
-                  names: ["ACME_API_KEY"],
+                  names: ["OLLAMA_API_KEY"],
                 },
               ],
               connections: [],
