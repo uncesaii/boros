@@ -39,6 +39,14 @@ updates:
       # breaking types across src/mcp, src/tool/code-mode and acp tests; treat
       # the SDK bump as a deliberate change.
       - dependency-name: "@modelcontextprotocol/sdk"
+      # Breaking-API upgrades currently in use: @actions/core 1→3 and
+      # @actions/github 6→9 (github.handler.ts), @agentclientprotocol/sdk
+      # 0.21→1.3 (ACP session types), @clack/prompts alpha→1.7 (prompt APIs).
+      # Each needs a deliberate migration.
+      - dependency-name: "@actions/core"
+      - dependency-name: "@actions/github"
+      - dependency-name: "@agentclientprotocol/sdk"
+      - dependency-name: "@clack/prompts"
 
   - package-ecosystem: "github-actions"
     directory: "/"
